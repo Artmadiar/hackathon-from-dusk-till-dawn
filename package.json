@@ -10,7 +10,7 @@
     "test:e2e": "sh -c 'PLATFORM_DB=platform_e2e STRIPE_WEBHOOK_SECRET=whsec_e2e docker compose --profile core --profile test up -d --build --wait && pnpm --filter @fdtd/e2e scenarios; s=$?; PLATFORM_DB=platform_e2e docker compose --profile core --profile test down; exit $s'",
     "seed": "pnpm --filter @fdtd/platform seed",
     "db:migrate": "pnpm --filter @fdtd/platform db:migrate",
-    "demo:real": "echo 'S10: not implemented yet' && exit 1",
+    "demo:real": "sh -c 'LLM=real docker compose --profile core --profile dev --profile stripe up -d --build --wait && pnpm --filter @fdtd/e2e demo:real'",
     "e2e:up": "PLATFORM_DB=platform_e2e STRIPE_WEBHOOK_SECRET=whsec_e2e docker compose --profile core --profile test up -d --build --wait",
     "e2e:run": "pnpm --filter @fdtd/e2e scenarios",
     "e2e:down": "PLATFORM_DB=platform_e2e docker compose --profile core --profile test down"

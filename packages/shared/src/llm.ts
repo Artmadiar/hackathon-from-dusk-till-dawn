@@ -46,7 +46,7 @@ export class AnthropicLlm implements Llm {
     const res = await this.client.messages.create({
       model: this.model,
       max_tokens: req.maxTokens ?? 1024,
-      temperature: 0, // N3
+      // N3 задумывал temperature 0, но для claude-sonnet-5-5 параметр deprecated (400)
       ...(req.system ? { system: req.system } : {}),
       messages: req.messages,
       ...(req.tools ? { tools: req.tools as Anthropic.Tool[] } : {}),
