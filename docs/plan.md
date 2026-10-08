@@ -183,7 +183,7 @@ CLOCK=real|fixed:2026-10-09T09:00:00Z   # fixed — для детерминир�
 | S2 | готов | Ledger + Policy на Postgres: 22 теста (C01–C10, B6) зелёные. capture = HOLD_RELEASE + CAPTURE_OUT + CAPTURE_IN, дневной лимит без двойного счёта. Миграции применяются при старте платформы |
 | S3 | готов | DealService: вся таблица переходов 3.5 (18 недопустимых комбинаций отвергаются без побочных эффектов). Registry: discovery по покрытию категорий, рейтинг 3.3.1, seed U2. Events в PG + REST/SSE с курсором since и фильтром по роли на сервере (R8). Диспетчер: /quote allSettled+таймаут, /run дедуп (R7), /cancel (K4). 64 теста платформы |
 | S4 | готов | demo-store: SQLite, атомарный резерв всего заказа (B4/C23), inventoryLag со снимком и «продать офлайн» (R1), webhook HMAC `t,n,v1` в `x-store-signature` + ретраи с backoff, 4xx не ретраим (K7), отмена возвращает резерв, лендинг + дашборд с кнопками. Ответ `/orders` всегда `pending`, решение — webhook. Seed ×4. 22 теста (2.5); compose: 4 магазина отдают разные каталоги |
-| S5 | не начат | |
+| S5 | готов | provider-agent: make_quote (LLM подбирает sku, живая цена+markup, minOrderTotal, ETA = расписание+буфер B7), fulfil с opaque buyerRef и таймером C20, webhook-приёмник (HMAC+nonce+staleness, дедуп по storeOrderId C08, свой валидатор «подтверждение ⊇ заказ»), /cancel K4, JWT-auth от платформы. Порты: StoreClient K6 (http), PlatformPort K5 (http-клиент готов, серверные маршруты /agent/* — S7). 18 тестов (2.4), C19/C20 зелёные |
 | S6 | не начат | |
 | S7 | не начат | |
 | S8 | не начат | |

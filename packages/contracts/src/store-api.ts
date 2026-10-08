@@ -16,6 +16,7 @@ export const CatalogItem = z.object({
 });
 export type CatalogItem = z.infer<typeof CatalogItem>;
 export const Catalog = z.array(CatalogItem);
+export type Catalog = z.infer<typeof Catalog>;
 
 /** GET {apiUrl}/products/{sku} — живая цена и остаток (B15) */
 export const StoreProduct = z.object({
