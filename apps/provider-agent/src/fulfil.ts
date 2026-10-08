@@ -16,11 +16,12 @@ export interface FulfilDeps {
   log?: { warn: (o: unknown, msg: string) => void; error: (o: unknown, msg: string) => void };
 }
 
-const eventBase = (deps: FulfilDeps, dealId: string, correlationId?: string) => ({
+const eventBase = (deps: FulfilDeps, dealId: string, correlationId?: string, runId?: string) => ({
   actor: `provider-agent:${deps.providerId}`,
   dealId,
   providerId: deps.providerId,
   correlationId,
+  runId,
 });
 
 /**
@@ -32,7 +33,8 @@ export async function startFulfil(
   deps: FulfilDeps,
   input: { dealId: string; taskId: string; quote: Quote; request: Req; correlationId?: string },
 ): Promise<void> {
-  const base = { kind: 'agent' as const, taskId: input.taskId, ...eventBase(deps, input.dealId, input.correlationId) };
+  const runId = deps.idGen.next('run');
+  const base = { kind: 'agent' as const, taskId: input.taskId, ...eventBase(deps, input.dealId, input.correlationId, runId) };
   try {
     const order = await deps.store.placeOrder({
       items: input.quote.lines.map((l) => ({ sku: l.sku, qty: l.quantity })),
@@ -43,6 +45,7 @@ export async function startFulfil(
     timer.unref?.();
     deps.book.add({
       dealId: input.dealId,
+      runId,
       storeOrderId: order.storeOrderId,
       quote: input.quote,
       orderedLines: input.quote.lines.map((l) => ({ sku: l.sku, qty: l.quantity })),
@@ -64,7 +67,7 @@ async function onStoreTimeout(deps: FulfilDeps, dealId: string): Promise<void> {
   if (!state || state.phase !== 'placed') return;
   deps.book.finish(dealId, 'withdrawn');
   await deps.platform.event({
-    kind: 'agent', type: 'DECISION', ...eventBase(deps, dealId),
+    kind: 'agent', type: 'DECISION', ...eventBase(deps, dealId, undefined, state.runId),
     payload: { step: 'store_webhook', decision: 'withdraw_offer', reason: 'timeout' },
   });
   await deps.platform.withdrawOffer(dealId, 'timeout');
@@ -121,7 +124,7 @@ export async function handleStoreWebhook(
   /* C08: повтор по storeOrderId -> ничего */
   if (state.phase !== 'placed') return { code: 200, body: { ok: true, duplicate: true } };
 
-  const base = { kind: 'agent' as const, ...eventBase(deps, state.dealId, correlationId) };
+  const base = { kind: 'agent' as const, ...eventBase(deps, state.dealId, correlationId, state.runId) };
 
   if (payload.status === 'rejected') {
     deps.book.finish(state.dealId, 'withdrawn');
@@ -165,7 +168,7 @@ export async function cancelDeal(deps: FulfilDeps, dealId: string, reason: strin
   await deps.store.cancelOrder(state.storeOrderId).catch((err) =>
     deps.log?.warn({ dealId, err: String(err) }, 'cancel_order failed'));
   await deps.platform.event({
-    kind: 'agent', type: 'TOOL_RESULT', ...eventBase(deps, dealId),
+    kind: 'agent', type: 'TOOL_RESULT', ...eventBase(deps, dealId, undefined, state.runId),
     payload: { tool: 'cancel_order', storeOrderId: state.storeOrderId, reason },
   });
 }

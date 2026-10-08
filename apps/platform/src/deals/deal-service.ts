@@ -91,13 +91,21 @@ export class DealService {
       .where(eq(tasks.id, taskId));
   }
 
-  async failTask(taskId: string, reason: string): Promise<void> {
+  /** C13/C22: одно уведомление, причина по каждой оферте в details. */
+  async failTask(taskId: string, reason: string, details?: Record<string, string>): Promise<void> {
     const task = await this.getTask(taskId);
     if (!task) throw new Error(`task ${taskId} not found`);
     await this.deps.db.update(tasks)
       .set({ status: 'FAILED', failReason: reason, updatedAt: this.deps.clock.now() })
       .where(eq(tasks.id, taskId));
-    await this.emit({ type: 'TASK_FAILED', taskId, userId: task.userId, payload: { reason } });
+    await this.emit({ type: 'TASK_FAILED', taskId, userId: task.userId, payload: { reason, details: details ?? null } });
+  }
+
+  /** Агент дописывает оценённый бюджет в запрос (C35). */
+  async updateRequest(taskId: string, request: Req): Promise<void> {
+    await this.deps.db.update(tasks)
+      .set({ request, updatedAt: this.deps.clock.now() })
+      .where(eq(tasks.id, taskId));
   }
 
   async excludeProvider(taskId: string, providerId: string): Promise<void> {

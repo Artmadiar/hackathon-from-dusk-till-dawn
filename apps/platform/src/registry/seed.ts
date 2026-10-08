@@ -7,6 +7,12 @@ import { RegistryService } from './registry.js';
 
 export const DEMO_USER_ID = 'buyer-1';
 
+/** TODO(S8): профиль из таблицы users; до auth агент получает демо-профиль. */
+export const DEMO_USER_PROFILE = {
+  deliveryAddress: 'Praha 7, Dukelských hrdinů 21',
+  preferences: { preferredProviderIds: [] as string[] },
+};
+
 /** Четыре магазина из концепта 3.3; URL агентов — compose-сеть по умолчанию. */
 export const DEMO_PROVIDERS = [
   { id: 'aqua', name: 'AquaDoručení', categories: ['water', 'office'], ratingX100: 470, port: 3382 },

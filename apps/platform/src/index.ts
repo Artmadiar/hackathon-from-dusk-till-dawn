@@ -6,6 +6,8 @@ import { DealService } from './deals/deal-service.js';
 import { EventsQuery } from './events/query.js';
 import { registerEventRoutes } from './events/routes.js';
 import { PgEventWriter } from './events/writer.js';
+import { registerAgentRoutes } from './http/agent-routes.js';
+import { registerPublicRoutes } from './http/public-routes.js';
 import { LedgerService } from './ledger/ledger.js';
 import { PolicyService } from './policy/policy.js';
 import { RegistryService } from './registry/registry.js';
@@ -21,18 +23,19 @@ const events = new PgEventWriter(db, clock);
 const policy = new PolicyService(db);
 const ledger = new LedgerService(db, events, clock);
 const registry = new RegistryService(db, events, clock);
+const jwtSecret = process.env.AGENT_JWT_SECRET ?? 'dev-agent-secret';
 const dispatcher = new AgentDispatcher({
   clock, events,
-  jwtSecret: process.env.AGENT_JWT_SECRET ?? 'dev-agent-secret',
+  jwtSecret,
   buyerAgentUrl: process.env.BUYER_AGENT_URL ?? 'http://buyer-agent:3381',
 });
 const dealService = new DealService({
   db, events, clock, idGen: uuidIdGen, policy, registry, gateway: dispatcher,
 });
-void ledger; void dealService; // HTTP API поверх сервисов — S7/S8
-
 const app = createApp({ service: 'platform' });
 registerEventRoutes(app, { eventsQuery: new EventsQuery(db) });
+registerAgentRoutes(app, { db, deals: dealService, registry, policy, dispatcher, events, clock, jwtSecret });
+registerPublicRoutes(app, { db, deals: dealService, ledger, registry, policy, dispatcher, events, clock });
 if (applied.length) app.log.info({ applied }, 'migrations applied');
 
 const port = Number(process.env.PORT ?? 3380);

@@ -1,4 +1,5 @@
-import { clockFromEnv, llmFromEnv, uuidIdGen } from '@fdtd/shared';
+import { AnthropicLlm, clockFromEnv, uuidIdGen } from '@fdtd/shared';
+import { fakeProviderLlm } from './fake-llm.js';
 import { createProviderAgent } from './app.js';
 import { rulesFromEnv } from './config.js';
 import { httpPlatform } from './http-platform.js';
@@ -11,7 +12,7 @@ const jwtSecret = process.env.AGENT_JWT_SECRET ?? 'dev-agent-secret';
 const { app } = createProviderAgent({
   providerId,
   rules: rulesFromEnv(providerId),
-  llm: llmFromEnv(),
+  llm: process.env.LLM === 'real' ? new AnthropicLlm({ apiKey: process.env.ANTHROPIC_API_KEY }) : fakeProviderLlm(),
   store: httpStoreClient(process.env.STORE_URL ?? 'http://localhost:3390'),
   platform: httpPlatform({
     platformUrl: process.env.PLATFORM_URL ?? 'http://platform:3380',

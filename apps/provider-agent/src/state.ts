@@ -9,6 +9,8 @@ export type DealPhase = 'placed' | 'proof_submitted' | 'withdrawn' | 'cancelled'
 
 export interface DealState {
   dealId: string;
+  /** Один прогон исполнителя = одна сделка (концепт 3.8). */
+  runId: string;
   storeOrderId: string;
   quote: Quote;
   orderedLines: Array<{ sku: string; qty: number }>;

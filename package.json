@@ -7,9 +7,12 @@
     "dev": "docker compose --profile core --profile dev up --build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r exec tsc --noEmit",
-    "test:e2e": "echo 'S7: not implemented yet' && exit 1",
+    "test:e2e": "sh -c 'docker compose --profile core --profile test up -d --build --wait && pnpm --filter @fdtd/e2e scenarios; s=$?; docker compose --profile core --profile test down; exit $s'",
     "seed": "pnpm --filter @fdtd/platform seed",
     "db:migrate": "pnpm --filter @fdtd/platform db:migrate",
-    "demo:real": "echo 'S10: not implemented yet' && exit 1"
+    "demo:real": "echo 'S10: not implemented yet' && exit 1",
+    "e2e:up": "docker compose --profile core --profile test up -d --build --wait",
+    "e2e:run": "pnpm --filter @fdtd/e2e scenarios",
+    "e2e:down": "docker compose --profile core --profile test down"
   }
 }

@@ -1,0 +1,18 @@
+{
+  "name": "@fdtd/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scenarios": "vitest run"
+  },
+  "dependencies": {
+    "@fdtd/contracts": "workspace:*",
+    "@fdtd/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.3"
+  }
+}
