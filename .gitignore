@@ -5,4 +5,5 @@ dist/
 !.env.example
 *.sqlite
 *.db
+*.log
 .DS_Store

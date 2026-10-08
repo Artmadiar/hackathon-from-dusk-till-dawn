@@ -1,0 +1,206 @@
+# Профили: core (11 сервисов) · dev (+web) · stripe (+stripe-cli) · test (+store-5, БД platform_test)
+# Порты 3380-3399 — зарезервированный блок (концепт 10.1, ~/.claude/registry.md)
+name: fdtd
+
+x-health: &health
+  test: ["CMD", "node", "-e", "fetch(`http://localhost:$${process.env.PORT}/health`).then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+  interval: 5s
+  timeout: 3s
+  retries: 20
+  start_period: 10s
+
+services:
+  db:
+    image: postgres:16-alpine
+    profiles: ["core"]
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: platform
+    ports: ["3386:5432"]
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d platform"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  platform:
+    build: { context: ., args: { APP: platform } }
+    image: fdtd-platform
+    profiles: ["core"]
+    environment:
+      SERVICE_NAME: platform
+      PORT: "3380"
+      DATABASE_URL: postgres://app:app@db:5432/platform
+      AGENT_JWT_SECRET: ${AGENT_JWT_SECRET:-dev-agent-secret}
+      SESSION_SECRET: ${SESSION_SECRET:-dev-session-secret}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      CLOCK: ${CLOCK:-real}
+    ports: ["3380:3380"]
+    depends_on:
+      db: { condition: service_healthy }
+    healthcheck: *health
+
+  buyer-agent:
+    build: { context: ., args: { APP: buyer-agent } }
+    image: fdtd-buyer-agent
+    profiles: ["core"]
+    environment:
+      SERVICE_NAME: buyer-agent
+      PORT: "3381"
+      PLATFORM_URL: http://platform:3380
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      LLM: ${LLM:-fake}
+      CLOCK: ${CLOCK:-real}
+    ports: ["3381:3381"]
+    healthcheck: *health
+
+  provider-agent-1:
+    build: { context: ., args: { APP: provider-agent } }
+    image: fdtd-provider-agent
+    profiles: ["core"]
+    environment: &provider-env
+      SERVICE_NAME: provider-agent
+      PORT: "3382"
+      PROVIDER_ID: aqua
+      STORE_URL: http://store-1:3390
+      WEBHOOK_SECRET: dev-webhook-secret-aqua
+      PLATFORM_URL: http://platform:3380
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      LLM: ${LLM:-fake}
+      CLOCK: ${CLOCK:-real}
+    ports: ["3382:3382"]
+    healthcheck: *health
+
+  provider-agent-2:
+    image: fdtd-provider-agent
+    build: { context: ., args: { APP: provider-agent } }
+    profiles: ["core"]
+    environment:
+      <<: *provider-env
+      PORT: "3383"
+      PROVIDER_ID: papirna
+      STORE_URL: http://store-2:3391
+      WEBHOOK_SECRET: dev-webhook-secret-papirna
+    ports: ["3383:3383"]
+    healthcheck: *health
+
+  provider-agent-3:
+    image: fdtd-provider-agent
+    build: { context: ., args: { APP: provider-agent } }
+    profiles: ["core"]
+    environment:
+      <<: *provider-env
+      PORT: "3384"
+      PROVIDER_ID: kancelar
+      STORE_URL: http://store-3:3392
+      WEBHOOK_SECRET: dev-webhook-secret-kancelar
+    ports: ["3384:3384"]
+    healthcheck: *health
+
+  provider-agent-4:
+    image: fdtd-provider-agent
+    build: { context: ., args: { APP: provider-agent } }
+    profiles: ["core"]
+    environment:
+      <<: *provider-env
+      PORT: "3385"
+      PROVIDER_ID: levny
+      STORE_URL: http://store-4:3393
+      WEBHOOK_SECRET: dev-webhook-secret-levny
+    ports: ["3385:3385"]
+    healthcheck: *health
+
+  store-1:
+    build: { context: ., args: { APP: demo-store } }
+    image: fdtd-demo-store
+    profiles: ["core"]
+    environment: &store-env
+      SERVICE_NAME: demo-store
+      PORT: "3390"
+      SEED: aqua
+      WEBHOOK_URL: http://provider-agent-1:3382/hooks/store
+      WEBHOOK_SECRET: dev-webhook-secret-aqua
+      CLOCK: ${CLOCK:-real}
+    ports: ["3390:3390"]
+    healthcheck: *health
+
+  store-2:
+    image: fdtd-demo-store
+    build: { context: ., args: { APP: demo-store } }
+    profiles: ["core"]
+    environment:
+      <<: *store-env
+      PORT: "3391"
+      SEED: papirna
+      WEBHOOK_URL: http://provider-agent-2:3383/hooks/store
+      WEBHOOK_SECRET: dev-webhook-secret-papirna
+    ports: ["3391:3391"]
+    healthcheck: *health
+
+  store-3:
+    image: fdtd-demo-store
+    build: { context: ., args: { APP: demo-store } }
+    profiles: ["core"]
+    environment:
+      <<: *store-env
+      PORT: "3392"
+      SEED: kancelar
+      WEBHOOK_URL: http://provider-agent-3:3384/hooks/store
+      WEBHOOK_SECRET: dev-webhook-secret-kancelar
+    ports: ["3392:3392"]
+    healthcheck: *health
+
+  store-4:
+    image: fdtd-demo-store
+    build: { context: ., args: { APP: demo-store } }
+    profiles: ["core"]
+    environment:
+      <<: *store-env
+      PORT: "3393"
+      SEED: levny
+      WEBHOOK_URL: http://provider-agent-4:3385/hooks/store
+      WEBHOOK_SECRET: dev-webhook-secret-levny
+    ports: ["3393:3393"]
+    healthcheck: *health
+
+  # dev: Vite поверх core (прокси на 3380)
+  web:
+    image: fdtd-web
+    build: { context: ., args: { APP: web } }
+    profiles: ["dev"]
+    command: pnpm --filter @fdtd/web dev -- --host 0.0.0.0 --port 3387
+    environment:
+      PORT: "3387"
+      VITE_API_URL: http://localhost:3380
+    ports: ["3387:3387"]
+
+  # stripe: проброс webhook'ов в платформу
+  stripe-cli:
+    image: stripe/stripe-cli:latest
+    profiles: ["stripe"]
+    command: listen --forward-to http://platform:3380/webhooks/stripe
+    environment:
+      STRIPE_API_KEY: ${STRIPE_SECRET_KEY:-}
+    depends_on: [platform]
+
+  # test: пятый магазин для C27 (онбординг без перезапуска)
+  store-5:
+    image: fdtd-demo-store
+    build: { context: ., args: { APP: demo-store } }
+    profiles: ["test"]
+    environment:
+      <<: *store-env
+      PORT: "3394"
+      SEED: kancelar
+      WEBHOOK_URL: ""
+      WEBHOOK_SECRET: ""
+    ports: ["3394:3394"]
+    healthcheck: *health
+
+volumes:
+  db-data:

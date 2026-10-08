@@ -1,0 +1,15 @@
+{
+  "name": "fdtd",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.5.1",
+  "scripts": {
+    "dev": "docker compose --profile core --profile dev up --build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r exec tsc --noEmit",
+    "test:e2e": "echo 'S7: not implemented yet' && exit 1",
+    "seed": "echo 'S2/S4: not implemented yet' && exit 1",
+    "db:migrate": "echo 'S2: not implemented yet' && exit 1",
+    "demo:real": "echo 'S10: not implemented yet' && exit 1"
+  }
+}
