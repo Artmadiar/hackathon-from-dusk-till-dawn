@@ -1,0 +1,50 @@
+{
+  "id": "levny",
+  "name": "Levný Papír",
+  "tagline": "Nejlevnější papír a kancelářské potřeby s pomalou ale spolehlivou doručkou.",
+  "inventoryLag": false,
+  "autoConfirm": true,
+  "delivery": {"type": "leadDays", "days": 7},
+  "products": [
+    {
+      "sku": "LEV-A4-500",
+      "title": "Kancelářský papír A4 500 listů",
+      "description": "Bílý papír A4 80 g/m² za nejnižší cenu na trhu.",
+      "unit": "pack",
+      "price": 450,
+      "category": "paper",
+      "stock": 150,
+      "emoji": "📄"
+    },
+    {
+      "sku": "LEV-ENVELOPES",
+      "title": "Obálky C6 bílé",
+      "description": "Ekonomické balení 50 kusů bílých obálek se samolepicím pruhem.",
+      "unit": "pack",
+      "price": 210,
+      "category": "paper",
+      "stock": 120,
+      "emoji": "✉️"
+    },
+    {
+      "sku": "LEV-FOLDERS",
+      "title": "Papírová složka s chlopní",
+      "description": "Jednobarevná ekonomická složka pro archivaci a organizaci papírů.",
+      "unit": "pcs",
+      "price": 150,
+      "category": "office",
+      "stock": 200,
+      "emoji": "🗂️"
+    },
+    {
+      "sku": "LEV-BINDER",
+      "title": "Kroužkový pořadač A4",
+      "description": "Plastový pořadač s dvěma kroužky pro sešívání listů a dokumentů.",
+      "unit": "pcs",
+      "price": 320,
+      "category": "office",
+      "stock": 80,
+      "emoji": "📕"
+    }
+  ]
+}

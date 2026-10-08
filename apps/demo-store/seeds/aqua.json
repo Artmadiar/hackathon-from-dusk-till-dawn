@@ -1,0 +1,50 @@
+{
+  "id": "aqua",
+  "name": "AquaDoručení",
+  "tagline": "Čerstvá voda na dveře v úterý a čtvrtek.",
+  "inventoryLag": false,
+  "autoConfirm": true,
+  "delivery": {"type": "weekdays", "days": [2, 4]},
+  "products": [
+    {
+      "sku": "AQU-BOTTLE-19L",
+      "title": "Voda v plastové lahvi 19L",
+      "description": "Kvalitní pitná voda v lahvi o objemu 19 litrů.",
+      "unit": "bottle",
+      "price": 1200,
+      "category": "water",
+      "stock": 75,
+      "emoji": "💧"
+    },
+    {
+      "sku": "AQU-CUPS-250ML",
+      "title": "Papírové kelímky 250 ml",
+      "description": "Sada papírových kelímků vhodných pro návštěvy.",
+      "unit": "pack",
+      "price": 300,
+      "category": "water",
+      "stock": 50,
+      "emoji": "🥤"
+    },
+    {
+      "sku": "AQU-PUMP",
+      "title": "Čerpací pumpa na lahev vody",
+      "description": "Ruční pumpa pro snadné čerpání vody z velké lahve.",
+      "unit": "pcs",
+      "price": 450,
+      "category": "water",
+      "stock": 40,
+      "emoji": "🚿"
+    },
+    {
+      "sku": "AQU-BOTTLE-5L",
+      "title": "Voda v plastové lahvi 5L",
+      "description": "Menší balení pitné vody pro jednotlivce a malé domácnosti.",
+      "unit": "bottle",
+      "price": 350,
+      "category": "water",
+      "stock": 100,
+      "emoji": "💧"
+    }
+  ]
+}

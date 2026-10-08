@@ -1,0 +1,80 @@
+{
+  "id": "kancelar",
+  "name": "Kancelář Plus",
+  "tagline": "Vše pro kancelář za férové ceny s doručením za dva dny.",
+  "inventoryLag": false,
+  "autoConfirm": true,
+  "delivery": {"type": "leadDays", "days": 2},
+  "products": [
+    {
+      "sku": "KAN-A4-500",
+      "title": "Kancelářský papír A4 500 listů",
+      "description": "Bílý papír A4 80 g/m² pro všechny tiskárny a kopírky.",
+      "unit": "pack",
+      "price": 800,
+      "category": "paper",
+      "stock": 60,
+      "emoji": "📄"
+    },
+    {
+      "sku": "KAN-PEN-BLUE",
+      "title": "Kuličková tužka modrá",
+      "description": "Balení 20 kusů modrých kuličkových per s ergonomickým držadlem.",
+      "unit": "pack",
+      "price": 250,
+      "category": "writing",
+      "stock": 50,
+      "emoji": "✒️"
+    },
+    {
+      "sku": "KAN-MARKERS",
+      "title": "Permanentní značkovače 10 barev",
+      "description": "Sada barevných permanentních značkovačů pro značení a plakáty.",
+      "unit": "pack",
+      "price": 380,
+      "category": "writing",
+      "stock": 40,
+      "emoji": "🖍️"
+    },
+    {
+      "sku": "KAN-STAPLER",
+      "title": "Kancelářská sešívačka",
+      "description": "Robustní sešívačka schopná stahovat až 30 listů papíru.",
+      "unit": "pcs",
+      "price": 750,
+      "category": "office",
+      "stock": 35,
+      "emoji": "📎"
+    },
+    {
+      "sku": "KAN-CLIPS",
+      "title": "Sponky na papír 50 mm",
+      "description": "Balení 100 kusů kovových sponek vhodných pro svázání papírů.",
+      "unit": "pack",
+      "price": 280,
+      "category": "office",
+      "stock": 70,
+      "emoji": "📎"
+    },
+    {
+      "sku": "KAN-STICKY",
+      "title": "Samolepicí lístky neon",
+      "description": "Balení tří barev neonových samolepicích lístků 100 listů každého.",
+      "unit": "pack",
+      "price": 320,
+      "category": "office",
+      "stock": 55,
+      "emoji": "📝"
+    },
+    {
+      "sku": "KAN-FOLDERS",
+      "title": "Složka s chlopní",
+      "description": "Cardboardová složka v různých barvách pro organizaci dokumentů.",
+      "unit": "pcs",
+      "price": 180,
+      "category": "office",
+      "stock": 100,
+      "emoji": "🗂️"
+    }
+  ]
+}

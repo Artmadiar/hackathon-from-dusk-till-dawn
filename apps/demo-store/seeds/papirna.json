@@ -1,0 +1,71 @@
+{
+  "id": "papirna",
+  "name": "Papírna Holešovice",
+  "tagline": "Kvalitní papír a psací potřeby s doručením následující den.",
+  "inventoryLag": true,
+  "autoConfirm": true,
+  "delivery": {"type": "leadDays", "days": 1},
+  "products": [
+    {
+      "sku": "PAP-A4-500",
+      "title": "Kancelářský papír A4 500 listů",
+      "description": "Bílý papír A4 80 g/m², ideální pro tisk a kopírování.",
+      "unit": "pack",
+      "price": 780,
+      "category": "paper",
+      "stock": 2,
+      "snapshotStock": 5,
+      "emoji": "📄"
+    },
+    {
+      "sku": "PAP-ENVELOPES-C6",
+      "title": "Obálky C6 bílé",
+      "description": "Balení 50 kusů bílých obálek velikosti C6 se samolepicím pruhem.",
+      "unit": "pack",
+      "price": 350,
+      "category": "paper",
+      "stock": 25,
+      "emoji": "✉️"
+    },
+    {
+      "sku": "PAP-PEN-BLUE",
+      "title": "Kuličková tužka modrá",
+      "description": "Sada 10 modrých kuličkových per s hladkým písmem.",
+      "unit": "pack",
+      "price": 180,
+      "category": "writing",
+      "stock": 30,
+      "emoji": "✒️"
+    },
+    {
+      "sku": "PAP-GEL-SET",
+      "title": "Sada gelových per 5 barev",
+      "description": "Barevná sada pěti gelových per pro tvorbu a designové práce.",
+      "unit": "pack",
+      "price": 520,
+      "category": "writing",
+      "stock": 20,
+      "emoji": "🖊️"
+    },
+    {
+      "sku": "PAP-NOTEBOOK",
+      "title": "Sešit linkovaný 100 listů",
+      "description": "Tuhý sešit s linkovaným papírem vhodný pro poznámky.",
+      "unit": "pcs",
+      "price": 450,
+      "category": "paper",
+      "stock": 35,
+      "emoji": "📓"
+    },
+    {
+      "sku": "PAP-PENCILS",
+      "title": "Sada tužek HB 12 kusů",
+      "description": "Profesionální grafitové tužky pro kreslení a psaní.",
+      "unit": "pack",
+      "price": 240,
+      "category": "writing",
+      "stock": 40,
+      "emoji": "✏️"
+    }
+  ]
+}
