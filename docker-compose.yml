@@ -174,17 +174,17 @@ services:
     image: fdtd-web
     build: { context: ., args: { APP: web } }
     profiles: ["dev"]
-    command: pnpm --filter @fdtd/web dev -- --host 0.0.0.0 --port 3387
+    command: pnpm --filter @fdtd/web dev
     environment:
       PORT: "3387"
-      VITE_API_URL: http://localhost:3380
+      PLATFORM_URL: http://platform:3380
     ports: ["3387:3387"]
 
   # stripe: проброс webhook'ов в платформу
   stripe-cli:
     image: stripe/stripe-cli:latest
     profiles: ["stripe"]
-    command: listen --forward-to http://platform:3380/webhooks/stripe
+    command: listen --events checkout.session.completed --forward-to http://platform:3380/webhooks/stripe
     environment:
       STRIPE_API_KEY: ${STRIPE_SECRET_KEY:-}
     depends_on: [platform]

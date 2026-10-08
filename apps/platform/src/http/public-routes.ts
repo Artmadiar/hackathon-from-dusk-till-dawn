@@ -104,6 +104,25 @@ export function registerPublicRoutes(app: FastifyInstance, deps: Deps): void {
     },
   );
 
+  /** C27: онбординг магазина — появляется в discovery без перезапуска. */
+  app.post('/providers/onboard', async (req, reply) => {
+    const identity = await resolveIdentity(req, deps.auth);
+    if (!identity) return reply.code(401).send({ error: 'unauthenticated' });
+    if (identity.role === 'buyer') return reply.code(403).send({ error: 'provider_or_admin_required' });
+    const parsed = z.object({
+      id: z.string().regex(/^[a-z0-9-]{2,32}$/),
+      name: z.string().min(1),
+      categories: z.array(z.string()).min(1),
+      agentUrl: z.string().url(),
+    }).safeParse(req.body);
+    if (!parsed.success) return reply.code(400).send({ error: 'bad_request', issues: parsed.error.issues });
+    const provider = await deps.registry.upsert(parsed.data);
+    await deps.ledger.createWallet({ ownerType: 'provider', ownerId: provider.id });
+    return reply.code(201).send({
+      provider: { id: provider.id, name: provider.name, categories: provider.categories, rating: provider.ratingX100 / 100 },
+    });
+  });
+
   app.get('/providers', async () => {
     const list = await deps.registry.list();
     return list.map((p) => ({
