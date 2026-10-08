@@ -1,8 +1,26 @@
+import { RotateCcw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { api, fmtTs, type EventView } from '../api';
-import { EventRow, summary } from '../components/EventFeed';
+import { EventRow, shortId, summary } from '../components/EventFeed';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-/** Админка: «что сейчас делает каждый агент», фильтры, полный журнал, сброс демо. */
+function Filter({ value, onChange, label, options }: {
+  value: string; onChange: (v: string) => void; label: string; options: string[];
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="h-8 rounded-md border bg-card px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+    >
+      <option value="">{label}: all</option>
+      {options.map((o) => <option key={o} value={o}>{o}</option>)}
+    </select>
+  );
+}
+
+/** Admin journal: what each agent is doing now, filters, the full platform log, demo reset. */
 export function AdminPage({ events }: { events: EventView[] }) {
   const [kind, setKind] = useState('');
   const [actor, setActor] = useState('');
@@ -18,7 +36,7 @@ export function AdminPage({ events }: { events: EventView[] }) {
     (!kind || e.kind === kind) && (!actor || e.actor === actor)
     && (!type || e.type === type) && (!taskId || e.taskId === taskId));
 
-  /* последнее agent-событие на агента = «что он делает сейчас» (3.8) */
+  /* the latest agent event per actor = "what is it doing right now" (concept 3.8) */
   const now = useMemo(() => {
     const byActor = new Map<string, EventView>();
     for (const e of events) if (e.kind === 'agent') byActor.set(e.actor, e);
@@ -26,57 +44,53 @@ export function AdminPage({ events }: { events: EventView[] }) {
   }, [events]);
 
   const reseed = async () => {
-    if (!window.confirm('Сбросить demo-данные? Задачи, сделки и журнал будут очищены.')) return;
+    if (!window.confirm('Reset demo data? Tasks, deals and the journal will be wiped.')) return;
     setBusy(true);
     try { await api('POST', '/dev/seed'); window.location.reload(); } finally { setBusy(false); }
   };
 
   return (
-    <>
-      <div className="row" style={{ justifyContent: 'space-between', marginBottom: 12 }}>
-        <h1 style={{ margin: 0 }}>Админка · журнал платформы</h1>
-        <button disabled={busy} onClick={() => void reseed()}>⟲ Сбросить демо</button>
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-semibold">Platform journal</h1>
+        <Button variant="outline" size="sm" disabled={busy} onClick={() => void reseed()}>
+          <RotateCcw /> Reset demo
+        </Button>
       </div>
 
-      <div className="card">
-        <h2>Агенты сейчас</h2>
-        {!now.length && <div className="muted">Агенты молчат — журнал пуст.</div>}
-        <div className="agents-now">
-          {now.map((e) => (
-            <div key={e.actor} className="agent-card">
-              <div className="who">{e.actor}</div>
-              <div className="small">{summary(e)}</div>
-              <div className="muted small">{fmtTs(e.ts)}{e.taskId && <a href={`#/task/${e.taskId}`}> · {e.taskId}</a>}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Card>
+        <CardHeader><CardTitle>Agents right now</CardTitle></CardHeader>
+        <CardContent>
+          {!now.length && <div className="py-4 text-center text-sm text-muted-foreground">Agents are quiet — the journal is empty.</div>}
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {now.map((e) => (
+              <div key={e.actor} className="rounded-lg border p-3">
+                <div className="text-xs font-semibold">{e.actor}</div>
+                <div className="mt-0.5 truncate text-sm" title={summary(e)}>{summary(e)}</div>
+                <div className="mt-0.5 text-[11px] text-muted-foreground">
+                  {fmtTs(e.ts)}
+                  {e.taskId && <a className="text-primary hover:underline" href={`#/task/${e.taskId}`}> · {shortId(e.taskId)}</a>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="card">
-        <div className="filters">
-          <select value={kind} onChange={(e) => setKind(e.target.value)}>
-            <option value="">kind: все</option>
-            <option value="domain">domain</option>
-            <option value="agent">agent</option>
-          </select>
-          <select value={actor} onChange={(e) => setActor(e.target.value)}>
-            <option value="">actor: все</option>
-            {actors.map((a) => <option key={a} value={a}>{a}</option>)}
-          </select>
-          <select value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="">type: все</option>
-            {types.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
-          <select value={taskId} onChange={(e) => setTaskId(e.target.value)}>
-            <option value="">задача: все</option>
-            {taskIds.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
-          <span className="muted small" style={{ alignSelf: 'center' }}>{filtered.length} из {events.length}</span>
-        </div>
-        <div className="feed">
-          {[...filtered].reverse().map((e) => <EventRow key={e.id} e={e} showTask />)}
-        </div>
-      </div>
-    </>
+      <Card>
+        <CardHeader className="flex-row flex-wrap items-center gap-2">
+          <Filter value={kind} onChange={setKind} label="kind" options={['domain', 'agent']} />
+          <Filter value={actor} onChange={setActor} label="actor" options={actors} />
+          <Filter value={type} onChange={setType} label="type" options={types} />
+          <Filter value={taskId} onChange={setTaskId} label="task" options={taskIds} />
+          <span className="text-xs text-muted-foreground">{filtered.length} of {events.length}</span>
+        </CardHeader>
+        <CardContent>
+          <div className="flex max-h-[65vh] flex-col gap-1.5 overflow-y-auto pr-1">
+            {[...filtered].reverse().map((e) => <EventRow key={e.id} e={e} showTask />)}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

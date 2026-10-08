@@ -1,8 +1,10 @@
+import { Boxes } from 'lucide-react';
 import { useEffect } from 'react';
 import { useRoute, navigate } from './router';
 import { useSession } from './session';
 import { useEvents } from './useEvents';
 import { Bell } from './components/Bell';
+import { IdentityMenu } from './components/IdentityMenu';
 import { AdminPage } from './pages/Admin';
 import { BuyerPage } from './pages/Buyer';
 import { LoginPage } from './pages/Login';
@@ -13,7 +15,7 @@ import { WalletPage } from './pages/Wallet';
 export function App() {
   const route = useRoute();
   const { session, loading, active, switchTo, logout } = useSession();
-  /* одна SSE-подписка на всё приложение; сервер фильтрует по активной учётке (R8) */
+  /* one SSE subscription for the whole app; the server filters by active identity (R8) */
   const events = useEvents({ enabled: Boolean(active), identityKey: active?.id });
 
   const isLogin = route.parts[0] === 'login';
@@ -21,7 +23,7 @@ export function App() {
     if (!loading && !session && !isLogin) navigate('/login');
   }, [loading, session, isLogin]);
 
-  if (loading) return <div className="page muted">Загрузка…</div>;
+  if (loading) return <div className="p-10 text-center text-sm text-muted-foreground">Loading…</div>;
   if (!session || !active || isLogin) return <LoginPage addToSession={route.query.get('add') === '1'} />;
 
   const page = () => {
@@ -37,39 +39,41 @@ export function App() {
     }
   };
 
-  return (
-    <>
-      <header className="topbar">
-        <span className="brand">⚙ Agentic Procurement</span>
-        <nav>
-          {active.role === 'buyer' && <>
-            <a href="#/" className={!route.parts[0] ? 'active' : ''}>Задачи</a>
-            <a href="#/wallet" className={route.parts[0] === 'wallet' ? 'active' : ''}>Кошелёк</a>
-          </>}
-          {active.role === 'admin' && <a href="#/admin" className="active">Админка</a>}
-          {active.role === 'provider' && <a href="#/provider" className="active">Портал исполнителя</a>}
-        </nav>
-        <span className="spacer" />
-        {active.role === 'buyer' && <Bell events={events} />}
-        <select
-          value={active.id}
-          onChange={(e) => {
-            if (e.target.value === '+') { navigate('/login?add=1'); return; }
-            void switchTo(e.target.value).then(() => navigate('/'));
-          }}
-        >
-          {session.identities.map((i) => (
-            <option key={i.id} value={i.id}>{i.name} · {roleName(i.role)}</option>
-          ))}
-          <option value="+">+ добавить учётку…</option>
-        </select>
-        <button onClick={() => { void logout().then(() => navigate('/login')); }}>Выйти</button>
-      </header>
-      <main className="page">{page()}</main>
-    </>
-  );
-}
+  const nav = active.role === 'buyer'
+    ? [{ href: '#/', label: 'Tasks', current: !route.parts[0] || route.parts[0] === 'task' },
+       { href: '#/wallet', label: 'Wallet', current: route.parts[0] === 'wallet' }]
+    : active.role === 'admin'
+      ? [{ href: '#/admin', label: 'Journal', current: true }]
+      : [{ href: '#/provider', label: 'Provider portal', current: true }];
 
-function roleName(role: string): string {
-  return role === 'buyer' ? 'заказчик' : role === 'provider' ? 'исполнитель' : 'админ';
+  return (
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-10 border-b bg-card/95 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
+          <a href="#/" className="flex items-center gap-2 font-semibold tracking-tight">
+            <Boxes className="size-5 text-primary" />
+            Agentic Procurement
+          </a>
+          <nav className="flex items-center gap-1">
+            {nav.map((n) => (
+              <a key={n.href} href={n.href}
+                className={`rounded-md px-3 py-1.5 text-sm transition-colors ${n.current ? 'bg-accent font-medium' : 'text-muted-foreground hover:bg-accent/60'}`}>
+                {n.label}
+              </a>
+            ))}
+          </nav>
+          <div className="ml-auto flex items-center gap-1">
+            {active.role === 'buyer' && <Bell events={events} />}
+            <IdentityMenu
+              session={session}
+              active={active}
+              onSwitch={(id) => { void switchTo(id).then(() => navigate('/')); }}
+              onLogout={() => { void logout().then(() => navigate('/login')); }}
+            />
+          </div>
+        </div>
+      </header>
+      <main className="mx-auto max-w-6xl px-4 py-6">{page()}</main>
+    </div>
+  );
 }

@@ -2,13 +2,18 @@ import { useEffect, useState } from 'react';
 import { api, usd, type DealView, type TaskView } from '../api';
 import { EventFeed } from '../components/EventFeed';
 import { useEvents } from '../useEvents';
+import { TASK_BADGE } from './Buyer';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
-const DEAL_BADGE: Record<string, string> = {
-  QUOTED: 'plain', HELD: 'info', ORDER_PLACED: 'warn', PROOF_RECEIVED: 'info',
-  SETTLED: 'ok', REJECTED_BY_POLICY: 'bad', CANCELLED: 'bad',
+type BadgeVariant = 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive';
+const DEAL_BADGE: Record<string, BadgeVariant> = {
+  QUOTED: 'outline', HELD: 'default', ORDER_PLACED: 'warning', PROOF_RECEIVED: 'default',
+  SETTLED: 'success', REJECTED_BY_POLICY: 'destructive', CANCELLED: 'destructive',
 };
 
-/** Задача: статус, сделки с офертами, живой таймлайн событий задачи. */
+/** Task view: status, quotes per deal, a live event timeline. */
 export function TaskPage({ taskId }: { taskId: string }) {
   const [task, setTask] = useState<TaskView | null>(null);
   const [deals, setDeals] = useState<DealView[]>([]);
@@ -21,57 +26,69 @@ export function TaskPage({ taskId }: { taskId: string }) {
       .catch(() => {});
   }, [taskId, events.length]);
 
-  if (!task) return <div className="muted">Задача {taskId} загружается…</div>;
+  if (!task) return <div className="py-10 text-center text-sm text-muted-foreground">Loading task {taskId}…</div>;
 
   return (
-    <>
-      <div className="card">
-        <div className="row">
-          <h1 style={{ margin: 0 }}>{task.request.items.map((i) => i.itemQuery).join(', ')}</h1>
-          <span className={`badge ${task.status === 'DONE' ? 'ok' : task.status === 'FAILED' ? 'bad' : 'info'}`}>{task.status}</span>
-        </div>
-        <p className="muted small" style={{ marginBottom: 0 }}>
-          Бюджет {usd(task.request.budget.max)}
-          {task.request.budget.source === 'estimated' && ' (оценка)'} ·
-          дедлайн {new Date(task.request.deadline).toLocaleString('ru-RU')} ·
-          доставка: {task.request.deliveryAddress}
-          {task.failReason && <span className="error"> · причина: {task.failReason}</span>}
-        </p>
-      </div>
+    <div className="flex flex-col gap-4">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center gap-2">
+            <CardTitle className="text-base">{task.request.items.map((i) => i.itemQuery).join(', ')}</CardTitle>
+            <Badge variant={TASK_BADGE[task.status]}>{task.status}</Badge>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Budget {usd(task.request.budget.max)}{task.request.budget.source === 'estimated' && ' (estimate)'}
+            {' · '}deadline {new Date(task.request.deadline).toLocaleString('en-GB')}
+            {' · '}deliver to {task.request.deliveryAddress}
+            {task.failReason && <span className="text-destructive"> · reason: {task.failReason}</span>}
+          </div>
+        </CardHeader>
+      </Card>
 
-      <div className="cols">
-        <div>
+      <div className="grid items-start gap-4 lg:grid-cols-[400px_1fr]">
+        <div className="flex flex-col gap-4">
           {deals.map((d) => (
-            <div key={d.id} className="card">
-              <div className="row">
-                <h2 style={{ margin: 0 }}>{d.providerId}</h2>
-                <span className={`badge ${DEAL_BADGE[d.status] ?? 'plain'}`}>{d.status}</span>
-                <span className="spacer" />
-                <b>{usd(d.quote.total)}</b>
-              </div>
-              <p className="muted small">доставка до {new Date(d.quote.deliveryEta).toLocaleDateString('ru-RU')}
-                {d.cancelReason && <span className="error"> · {d.cancelReason}</span>}</p>
-              <table className="lines">
-                <tbody>
-                  {d.quote.lines.map((l, i) => (
-                    <tr key={i}>
-                      <td>{l.title} <span className="muted mono">{l.sku}</span></td>
-                      <td className="num">{l.quantity} × {usd(l.unitPrice)}</td>
-                      <td className="num">{usd(l.lineTotal)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Card key={d.id}>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <CardTitle>{d.providerId}</CardTitle>
+                  <Badge variant={DEAL_BADGE[d.status] ?? 'outline'}>{d.status}</Badge>
+                  <span className="ml-auto font-semibold tabular-nums">{usd(d.quote.total)}</span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  delivery by {new Date(d.quote.deliveryEta).toLocaleDateString('en-GB')}
+                  {d.cancelReason && <span className="text-destructive"> · {d.cancelReason}</span>}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableBody>
+                    {d.quote.lines.map((l, i) => (
+                      <TableRow key={i}>
+                        <TableCell>
+                          {l.title} <span className="font-mono text-[11px] text-muted-foreground">{l.sku}</span>
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">{l.quantity} × {usd(l.unitPrice)}</TableCell>
+                        <TableCell className="text-right font-medium tabular-nums">{usd(l.lineTotal)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           ))}
-          {!deals.length && <div className="card muted">Сделок пока нет — агент собирает оферты.</div>}
+          {!deals.length && (
+            <Card><CardContent className="py-8 text-center text-sm text-muted-foreground">
+              No deals yet — the agent is collecting quotes.
+            </CardContent></Card>
+          )}
         </div>
 
-        <div className="card">
-          <h2>Таймлайн задачи</h2>
-          <EventFeed events={events} />
-        </div>
+        <Card>
+          <CardHeader><CardTitle>Task timeline</CardTitle></CardHeader>
+          <CardContent><EventFeed events={events} /></CardContent>
+        </Card>
       </div>
-    </>
+    </div>
   );
 }

@@ -62,7 +62,7 @@ export async function seedDemo(
   await ledger.createWallet({ ownerType: 'user', ownerId: DEMO_USER_ID });
   await policy.setPolicy({
     userId: DEMO_USER_ID,
-    maxPerDeal: 5000,   // 50 $ (концепт 4.1)
+    maxPerDeal: 7500,   // 75 $: демо-корзина paper+pens ~65 $ должна проходить; C03 ($152) всё равно режется
     maxPerDay: 10000,   // 100 $
     totalBudget: 10000, // 100 $
     allowedCategories: ['paper', 'writing', 'water', 'office'],

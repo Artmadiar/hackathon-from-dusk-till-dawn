@@ -73,7 +73,7 @@ async function mkDeal(status: DealStatus, over: Partial<Quote> = {}): Promise<De
   if (status === 'QUOTED') return deal;
   if (status === 'REJECTED_BY_POLICY') {
     const bad = await service.createDeal({
-      taskId: task.id, providerId: 'papirna', quote: { ...quote, total: 5100 },
+      taskId: task.id, providerId: 'papirna', quote: { ...quote, total: 7600 },
     });
     await service.accept(bad.id);
     return (await service.getDeal(bad.id))!;
@@ -144,7 +144,7 @@ describe('DealService: happy path (C11 ядро)', () => {
 
 describe('DealService: отказы политики и сроки', () => {
   it('C03 оферта дороже maxPerDeal -> REJECTED_BY_POLICY, леджер нетронут, fulfil не ушёл', async () => {
-    const deal = await mkDeal('QUOTED', { total: 5100, lines: [{ ...quote.lines[0]!, unitPrice: 1020, lineTotal: 5100 }] });
+    const deal = await mkDeal('QUOTED', { total: 7600, lines: [{ ...quote.lines[0]!, unitPrice: 1520, lineTotal: 7600 }] });
     const res = await service.accept(deal.id);
     expect(res).toMatchObject({ ok: false, code: 'over_max_per_deal' });
     expect((await service.getDeal(deal.id))!.status).toBe('REJECTED_BY_POLICY');

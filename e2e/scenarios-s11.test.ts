@@ -26,7 +26,7 @@ describe('C03: лимит политики (maxPerDeal)', () => {
   beforeAll(async () => { await resetDemo(); });
 
   it('оферта сверх maxPerDeal -> REJECTED_BY_POLICY, леджер не тронут', async () => {
-    // 40 синих ручек: papirna откажет (остаток 30), kancelar даст оферту > maxPerDeal $50
+    // 40 синих ручек: papirna откажет (остаток 30), kancelar даст оферту > maxPerDeal $75
     const taskId = await createTask({
       ...baseRequest,
       items: [{ itemQuery: 'синие шариковые ручки', quantity: 40, unit: 'шт', category: 'writing' }],

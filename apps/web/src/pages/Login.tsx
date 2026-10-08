@@ -2,8 +2,12 @@ import { useState } from 'react';
 import { api } from '../api';
 import { navigate } from '../router';
 import { useSession } from '../session';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input, Label } from '@/components/ui/input';
 
-/** Вход по OTP: код не уходит на почту — показывается здесь с пометкой SIMULATED (B8). */
+/** OTP sign-in. No email is sent — the code shows up right here, marked SIMULATED. */
 export function LoginPage({ addToSession }: { addToSession?: boolean }) {
   const { reload } = useSession();
   const [email, setEmail] = useState('buyer@demo.local');
@@ -30,45 +34,52 @@ export function LoginPage({ addToSession }: { addToSession?: boolean }) {
       await reload();
       navigate('/');
     } catch {
-      setErr('Код не подошёл (одноразовый, TTL 10 минут) — запросите новый.');
+      setErr('Code rejected — codes are one-time with a 10-minute TTL. Request a fresh one.');
     } finally { setBusy(false); }
   };
 
   return (
-    <div className="login-box">
-      <div className="card">
-        <h1>{addToSession ? 'Добавить учётку' : 'Вход'}</h1>
-        <p className="muted small">
-          Демо-учётки: buyer@demo.local · admin@demo.local · papirna@demo.local (и другие магазины).
-          Новый email станет заказчиком.
-        </p>
-        <label>Email</label>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} type="email"
-          onKeyDown={(e) => e.key === 'Enter' && void request()} />
-        <div style={{ marginTop: 10 }}>
-          <button className="primary" disabled={busy || !email} onClick={() => void request()}>
-            Получить код
-          </button>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-lg">{addToSession ? 'Add account' : 'Sign in'}</CardTitle>
+          <CardDescription>
+            Demo accounts: buyer@demo.local · admin@demo.local · papirna@demo.local (and other stores).
+            A new email registers as a buyer.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && void request()} />
+          </div>
+          <Button disabled={busy || !email} onClick={() => void request()}>Send code</Button>
 
-        {issued && (
-          <>
-            <p style={{ marginBottom: 0 }}>
-              <span className="badge sim">SIMULATED email</span>{' '}
-              <span className="muted small">код пришёл бы письмом; в демо показываем его тут:</span>
-            </p>
-            <div className="code-box">{issued}</div>
-            <label>Код из «письма»</label>
-            <div className="row">
-              <input style={{ flex: 1, width: 'auto' }} value={code} onChange={(e) => setCode(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && void verify()} />
-              <button onClick={() => setCode(issued)}>вставить</button>
-              <button className="primary" disabled={busy || !code} onClick={() => void verify()}>Войти</button>
+          {issued && (
+            <div className="flex flex-col gap-2 border-t pt-3">
+              <div className="text-xs text-muted-foreground">
+                <Badge variant="simulated">SIMULATED email</Badge>{' '}
+                the code would arrive by email — in this demo it shows here:
+              </div>
+              <div className="rounded-lg border border-dashed border-violet-300 bg-muted py-2 text-center font-mono text-2xl tracking-[0.4em]">
+                {issued}
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="code">Code from the “email”</Label>
+                <div className="flex gap-2">
+                  <Input id="code" value={code} onChange={(e) => setCode(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && void verify()} />
+                  <Button variant="outline" onClick={() => setCode(issued)}>paste</Button>
+                </div>
+              </div>
+              <Button disabled={busy || !code} onClick={() => void verify()}>Verify &amp; sign in</Button>
             </div>
-          </>
-        )}
-        {err && <p className="error small">{err}</p>}
-      </div>
+          )}
+          {err && <p className="text-xs text-destructive">{err}</p>}
+        </CardContent>
+      </Card>
     </div>
   );
 }
