@@ -39,6 +39,18 @@ export function createProviderAgent(deps: ProviderAgentDeps): { app: FastifyInst
     ...deps, book, log: app.log, nonces: new NonceGuard(),
   };
 
+  /* U6: карточка агента в духе A2A — кто я, что умею, как со мной авторизоваться */
+  app.get('/.well-known/agent.json', async () => ({
+    protocolVersion: 'a2a-inspired/0.1',
+    id: deps.providerId,
+    name: `provider-agent:${deps.providerId}`,
+    description: 'Procurement provider agent: quotes and fulfils office-supplies orders for its store',
+    contractTypes: ['office-supplies.v1'],
+    endpoints: { quote: 'POST /quote', fulfil: 'POST /fulfil', cancel: 'POST /cancel' },
+    auth: { scheme: 'jwt-hs256', iss: 'platform', aud: 'provider-agent' },
+    rules: { minOrderTotal: deps.rules.minOrderTotal, markupPct: deps.rules.markupPct },
+  }));
+
   const requirePlatformJwt = async (req: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const header = req.headers.authorization;
     const token = header?.startsWith('Bearer ') ? header.slice(7) : undefined;
