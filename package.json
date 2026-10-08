@@ -9,7 +9,7 @@
     "typecheck": "pnpm -r exec tsc --noEmit",
     "test:e2e": "echo 'S7: not implemented yet' && exit 1",
     "seed": "echo 'S2/S4: not implemented yet' && exit 1",
-    "db:migrate": "echo 'S2: not implemented yet' && exit 1",
+    "db:migrate": "pnpm --filter @fdtd/platform db:migrate",
     "demo:real": "echo 'S10: not implemented yet' && exit 1"
   }
 }
