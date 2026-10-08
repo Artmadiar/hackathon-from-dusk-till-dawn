@@ -34,7 +34,7 @@ services:
     environment:
       SERVICE_NAME: platform
       PORT: "3380"
-      DATABASE_URL: postgres://app:app@db:5432/platform
+      DATABASE_URL: postgres://app:app@db:5432/${PLATFORM_DB:-platform}
       AGENT_JWT_SECRET: ${AGENT_JWT_SECRET:-dev-agent-secret}
       SESSION_SECRET: ${SESSION_SECRET:-dev-session-secret}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}

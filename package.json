@@ -7,12 +7,12 @@
     "dev": "docker compose --profile core --profile dev up --build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r exec tsc --noEmit",
-    "test:e2e": "sh -c 'docker compose --profile core --profile test up -d --build --wait && pnpm --filter @fdtd/e2e scenarios; s=$?; docker compose --profile core --profile test down; exit $s'",
+    "test:e2e": "sh -c 'PLATFORM_DB=platform_e2e docker compose --profile core --profile test up -d --build --wait && pnpm --filter @fdtd/e2e scenarios; s=$?; PLATFORM_DB=platform_e2e docker compose --profile core --profile test down; exit $s'",
     "seed": "pnpm --filter @fdtd/platform seed",
     "db:migrate": "pnpm --filter @fdtd/platform db:migrate",
     "demo:real": "echo 'S10: not implemented yet' && exit 1",
-    "e2e:up": "docker compose --profile core --profile test up -d --build --wait",
+    "e2e:up": "PLATFORM_DB=platform_e2e docker compose --profile core --profile test up -d --build --wait",
     "e2e:run": "pnpm --filter @fdtd/e2e scenarios",
-    "e2e:down": "docker compose --profile core --profile test down"
+    "e2e:down": "PLATFORM_DB=platform_e2e docker compose --profile core --profile test down"
   }
 }
