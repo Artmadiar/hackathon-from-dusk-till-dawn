@@ -41,7 +41,7 @@ export function createTestContext(): TestContext {
 }
 
 export async function truncateAll(db: Db): Promise<void> {
-  await db.execute(sql`TRUNCATE ledger_entries, wallets, spending_policies RESTART IDENTITY CASCADE`);
+  await db.execute(sql`TRUNCATE events, deals, tasks, providers, ledger_entries, wallets, spending_policies RESTART IDENTITY CASCADE`);
 }
 
 /** Инвариант C10: материализованные balance/held = сумме леджера. */
