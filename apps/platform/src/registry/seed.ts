@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import type { Clock, EventWriter } from '@fdtd/shared';
 import type { Db } from '../db/client.js';
+import { users } from '../db/schema.js';
 import { LedgerService } from '../ledger/ledger.js';
 import { PolicyService } from '../policy/policy.js';
 import { RegistryService } from './registry.js';
@@ -33,10 +34,26 @@ export async function seedDemo(
   const agentUrlFor = opts.agentUrlFor
     ?? ((p: (typeof DEMO_PROVIDERS)[number]) => `http://provider-agent-${DEMO_PROVIDERS.indexOf(p) + 1}:${p.port}`);
 
+  /* сессии не трогаем: учётки те же после сброса, разлогинивать жюри незачем */
   await db.execute(sql`
-    TRUNCATE events, deals, tasks, providers, ledger_entries, wallets, spending_policies
+    TRUNCATE events, deals, tasks, providers, ledger_entries, wallets, spending_policies, users, otp_codes
     RESTART IDENTITY CASCADE
   `);
+
+  /* S8: учётки демо с фиксированными API-ключами (MCP) */
+  const now = clock.now();
+  await db.insert(users).values([
+    {
+      id: DEMO_USER_ID, email: 'buyer@demo.local', role: 'buyer', name: 'Demo Buyer',
+      deliveryAddress: DEMO_USER_PROFILE.deliveryAddress, preferences: DEMO_USER_PROFILE.preferences,
+      apiKey: 'ak-buyer-demo', createdAt: now,
+    },
+    { id: 'admin-1', email: 'admin@demo.local', role: 'admin', name: 'Platform Admin', apiKey: 'ak-admin-demo', createdAt: now },
+    ...DEMO_PROVIDERS.map((p) => ({
+      id: `${p.id}-owner`, email: `${p.id}@demo.local`, role: 'provider' as const,
+      name: `${p.name} (owner)`, providerId: p.id, apiKey: `ak-${p.id}-demo`, createdAt: now,
+    })),
+  ]);
 
   const ledger = new LedgerService(db, events, clock);
   const policy = new PolicyService(db);

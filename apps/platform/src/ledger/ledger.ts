@@ -273,9 +273,17 @@ export class LedgerService {
 
   private async emit(e: Omit<NewEvent, 'kind' | 'actor'> & { walletId?: string }): Promise<void> {
     const { walletId, ...rest } = e;
+    // владелец кошелька -> userId/providerId, иначе событие не попадёт в ленту роли (R8, N4)
+    let owner: Partial<Pick<NewEvent, 'userId' | 'providerId'>> = {};
+    if (walletId) {
+      const [w] = await this.db.select().from(wallets).where(eq(wallets.id, walletId));
+      if (w?.ownerType === 'user') owner = { userId: w.ownerId };
+      if (w?.ownerType === 'provider') owner = { providerId: w.ownerId };
+    }
     await this.events.emit({
       kind: 'domain',
       actor: 'platform',
+      ...owner,
       ...rest,
       payload: { ...(rest.payload as Record<string, unknown> ?? {}), ...(walletId ? { walletId } : {}) },
     });

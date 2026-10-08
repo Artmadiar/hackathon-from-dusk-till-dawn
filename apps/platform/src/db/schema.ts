@@ -103,3 +103,40 @@ export const deals = pgTable('deals', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 }, (t) => [index('deals_task_idx').on(t.taskId)]);
 export type Deal = typeof deals.$inferSelect;
+
+// ── S8: users, otp, sessions ────────────────────────────────────────
+
+export const USER_ROLES = ['buyer', 'provider', 'admin'] as const;
+export type UserRole = (typeof USER_ROLES)[number];
+
+export const users = pgTable('users', {
+  id: text('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  role: text('role').$type<UserRole>().notNull(),
+  name: text('name').notNull(),
+  providerId: text('provider_id'),
+  deliveryAddress: text('delivery_address'),
+  preferences: jsonb('preferences').$type<{ preferredProviderIds?: string[] }>().notNull().default({}),
+  apiKey: text('api_key').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+});
+export type User = typeof users.$inferSelect;
+
+export const otpCodes = pgTable('otp_codes', {
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  email: text('email').notNull(),
+  code: text('code').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  consumedAt: timestamp('consumed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+}, (t) => [index('otp_codes_email_idx').on(t.email, t.id)]);
+export type OtpCode = typeof otpCodes.$inferSelect;
+
+export const sessions = pgTable('sessions', {
+  id: text('id').primaryKey(),
+  identities: text('identities').array().notNull(),
+  activeIdentity: text('active_identity').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+});
+export type Session = typeof sessions.$inferSelect;

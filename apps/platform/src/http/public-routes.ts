@@ -1,16 +1,18 @@
 import type { FastifyInstance } from 'fastify';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { Req } from '@fdtd/contracts';
 import type { Clock, EventWriter } from '@fdtd/shared';
 import type { Db } from '../db/client.js';
-import { deals, wallets } from '../db/schema.js';
+import { deals, tasks, users, wallets } from '../db/schema.js';
 import type { DealService } from '../deals/deal-service.js';
 import type { AgentDispatcher } from '../dispatcher/dispatcher.js';
 import type { LedgerService } from '../ledger/ledger.js';
 import type { RegistryService } from '../registry/registry.js';
 import { seedDemo } from '../registry/seed.js';
 import type { PolicyService } from '../policy/policy.js';
+import type { AuthService } from '../auth/service.js';
+import { resolveIdentity } from './identity.js';
 
 interface Deps {
   db: Db;
@@ -21,25 +23,67 @@ interface Deps {
   dispatcher: AgentDispatcher;
   events: EventWriter;
   clock: Clock;
+  auth?: AuthService;
 }
 
-/**
- * Публичный API для UI/e2e. TODO(S8): сессии и роли; до auth маршруты открыты,
- * идентичность — в теле запроса.
- */
+/** Публичный API для UI/e2e. Идентичность: сессия (S8) или заголовки/тело (агенты, e2e). */
 export function registerPublicRoutes(app: FastifyInstance, deps: Deps): void {
   app.post('/tasks', async (req, reply) => {
     const parsed = z.object({
-      userId: z.string().min(1),
+      userId: z.string().min(1).optional(),
       request: Req,
       createdVia: z.enum(['ui', 'mcp']).optional(),
     }).safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: 'bad_request', issues: parsed.error.issues });
-    const task = await deps.deals.createTask(parsed.data);
+    const identity = await resolveIdentity(req, deps.auth);
+    const userId = identity?.role === 'buyer' ? identity.userId : parsed.data.userId;
+    if (!userId) return reply.code(401).send({ error: 'buyer_identity_required' });
+    const task = await deps.deals.createTask({ ...parsed.data, userId });
     /* B1: заказчику уходит /run, задача едет сама */
     deps.dispatcher.runBuyer({ taskId: task.id, reason: 'task_created' }).catch((err) =>
       app.log.error({ taskId: task.id, err: String(err) }, 'runBuyer dispatch failed'));
     return reply.code(201).send({ task });
+  });
+
+  /** N1: «заполнить из текста» — разбор текста агентом-заказчиком, без создания задачи. */
+  app.post('/tasks/parse', async (req, reply) => {
+    const parsed = z.object({ text: z.string().min(1), userId: z.string().min(1).optional() }).safeParse(req.body);
+    if (!parsed.success) return reply.code(400).send({ error: 'bad_request' });
+    const identity = await resolveIdentity(req, deps.auth);
+    const userId = identity?.role === 'buyer' ? identity.userId : parsed.data.userId;
+    if (!userId) return reply.code(401).send({ error: 'buyer_identity_required' });
+    const [user] = await deps.db.select().from(users).where(eq(users.id, userId));
+    const result = await deps.dispatcher.parseTask({
+      text: parsed.data.text,
+      deliveryAddress: user?.deliveryAddress ?? 'не указан',
+      correlationId: req.id,
+    });
+    if ('error' in result) return reply.code(422).send(result);
+    return result;
+  });
+
+  /** Список задач активной учётки: buyer — свои, admin — все. */
+  app.get('/tasks', async (req, reply) => {
+    const identity = await resolveIdentity(req, deps.auth);
+    if (!identity || identity.role === 'provider') return reply.code(identity ? 403 : 401).send({ error: 'buyer_or_admin_required' });
+    const rows = identity.role === 'admin'
+      ? await deps.db.select().from(tasks).orderBy(desc(tasks.createdAt)).limit(100)
+      : await deps.db.select().from(tasks).where(eq(tasks.userId, identity.userId)).orderBy(desc(tasks.createdAt)).limit(100);
+    return { tasks: rows };
+  });
+
+  /** Кошелёк активной учётки. */
+  app.get('/wallets/me', async (req, reply) => {
+    const identity = await resolveIdentity(req, deps.auth);
+    if (!identity || identity.role === 'admin') return reply.code(identity ? 403 : 401).send({ error: 'buyer_or_provider_required' });
+    const owner = identity.role === 'buyer'
+      ? { type: 'user' as const, id: identity.userId }
+      : { type: 'provider' as const, id: identity.providerId };
+    const [w] = await deps.db.select().from(wallets).where(and(
+      eq(wallets.ownerType, owner.type), eq(wallets.ownerId, owner.id),
+    ));
+    if (!w) return { ownerType: owner.type, ownerId: owner.id, balance: 0, held: 0, available: 0 };
+    return { ownerType: w.ownerType, ownerId: w.ownerId, balance: w.balance, held: w.held, available: w.balance - w.held };
   });
 
   app.get<{ Params: { id: string } }>('/tasks/:id', async (req, reply) => {

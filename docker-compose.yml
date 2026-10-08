@@ -39,6 +39,7 @@ services:
       SESSION_SECRET: ${SESSION_SECRET:-dev-session-secret}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      WEB_URL: ${WEB_URL:-http://localhost:3387}
       CLOCK: ${CLOCK:-real}
     ports: ["3380:3380"]
     depends_on:

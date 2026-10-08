@@ -1,29 +1,16 @@
-import type { FastifyInstance, FastifyRequest } from 'fastify';
-import type { EventsQuery, Identity } from './query.js';
-
-/** TODO(S8): идентичность из сессии; пока — заголовки x-role / x-user-id / x-provider-id. */
-export function identityFromHeaders(req: FastifyRequest): Identity | undefined {
-  const role = req.headers['x-role'];
-  if (role === 'admin') return { role: 'admin' };
-  if (role === 'buyer') {
-    const userId = req.headers['x-user-id'];
-    return typeof userId === 'string' && userId ? { role: 'buyer', userId } : undefined;
-  }
-  if (role === 'provider') {
-    const providerId = req.headers['x-provider-id'];
-    return typeof providerId === 'string' && providerId ? { role: 'provider', providerId } : undefined;
-  }
-  return undefined;
-}
+import type { FastifyInstance } from 'fastify';
+import type { AuthService } from '../auth/service.js';
+import { resolveIdentity } from '../http/identity.js';
+import type { EventsQuery } from './query.js';
 
 export function registerEventRoutes(
   app: FastifyInstance,
-  deps: { eventsQuery: EventsQuery; pollMs?: number },
+  deps: { eventsQuery: EventsQuery; auth?: AuthService; pollMs?: number },
 ): void {
   const pollMs = deps.pollMs ?? 300;
 
   app.get('/events', async (req, reply) => {
-    const identity = identityFromHeaders(req);
+    const identity = await resolveIdentity(req, deps.auth);
     if (!identity) return reply.code(401).send({ error: 'identity required (x-role)' });
     const q = req.query as { since?: string; limit?: string; taskId?: string };
     const list = await deps.eventsQuery.list({
@@ -37,7 +24,7 @@ export function registerEventRoutes(
 
   // SSE: poll по курсору; клиент после reconnect шлёт ?since=lastId (B14, C29)
   app.get('/events/stream', async (req, reply) => {
-    const identity = identityFromHeaders(req);
+    const identity = await resolveIdentity(req, deps.auth);
     if (!identity) return reply.code(401).send({ error: 'identity required (x-role)' });
     const q = req.query as { since?: string; taskId?: string };
     let cursor = q.since ? Number(q.since) : 0;

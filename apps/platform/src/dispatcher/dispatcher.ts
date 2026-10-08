@@ -1,4 +1,4 @@
-import { Quote, type Req } from '@fdtd/contracts';
+import { Quote, Req } from '@fdtd/contracts';
 import { signJwt, type Clock, type EventWriter } from '@fdtd/shared';
 import type { AgentGateway } from '../deals/deal-service.js';
 
@@ -80,6 +80,17 @@ export class AgentDispatcher implements AgentGateway {
         { aud: 'provider-agent' }),
       `cancel ${input.dealId} -> ${input.providerId}`,
     );
+  }
+
+  /** N1: «заполнить из текста» (S9) и MCP create_task — разбор текста агентом-заказчиком. */
+  async parseTask(input: { text: string; deliveryAddress: string; correlationId?: string }):
+    Promise<{ request: Req; assumptions: string[] } | { error: string }> {
+    const res = await this.post(`${this.deps.buyerAgentUrl}/parse`, {
+      text: input.text, deliveryAddress: input.deliveryAddress,
+    }, { aud: 'buyer-agent', correlationId: input.correlationId });
+    const body = await res.json() as { request?: unknown; assumptions?: string[]; error?: string };
+    if (!res.ok || body.error || !body.request) return { error: body.error ?? `http_${res.status}` };
+    return { request: Req.parse(body.request), assumptions: body.assumptions ?? [] };
   }
 
   /** R7: на задачу — один запрос за раз; параллельный вызов приклеивается к летящему. */
