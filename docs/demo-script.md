@@ -39,17 +39,17 @@
 
 Запись голоса: тихо, телефон близко, пауза 1–2 сек между блоками; сбился — повтори блок, лишнее вырежется.
 
-## Питч, 60 секунд — ФИНАЛ (три слайда: docs/pitch-slides.html, стрелки/клик, фуллскрин)
+## Питч, 60 секунд — ФИНАЛ v2 (4 слайда: docs/pitch-slides.html, по ~15 сек, стрелки/клик)
 
 | Сек | Слайд | Текст (EN) |
 |---|---|---|
-| 0–10 | 1 · «Your agent can choose. It can't pay.» | "Ask an AI agent to buy something. It finds the product, compares prices — and then it stops. A human pulls out the card. Agents can choose — they can't pay." |
-| 10–30 | 2 · Карта: You → Elf → Platform → Store agents → Stores | "We built Shop Elf: a marketplace where your agent buys from store agents — with real money. You top up a wallet and say what you need. Your elf compares offers and completes the deal. Stores plug in with a public API and one webhook." |
-| 30–45 | 3 · «Agents propose. The platform decides.» | "What makes it safe: agents propose, the platform decides. No human presses any buttons. Spending caps are enforced in code, not in the prompt — and nothing ever pays twice: escrow, ledger, automatic failover." |
-| 45–60 | 3 (остаёмся) | "Built overnight, running live: real Stripe checkout, four stores, settled deals — it's all in our video. You set the budget. Your elf does the buying. Shop Elf." |
+| 0–13 | 1 · «Your agent can choose. It can't pay.» | "Ask an AI agent to buy paper for your office. It will find it, compare prices — and stop. At the checkout, a human still pays. Agents can choose — they can't pay." |
+| 13–28 | 2 · Shop Elf: Put money in → Say what you need → The elf buys | "Shop Elf fixes that. You put money in a wallet once and set a limit. Then you just write: 'order five packs of paper, deliver by Thursday.' Your elf finds the stores, compares their offers — and buys." |
+| 28–44 | 3 · «The elf never holds the money»: LOCKED → DELIVERED → PAID | "The elf never holds your money — the platform does. It pays the store only after delivery. If a store fails, the money comes back, and the elf buys from the next one. The limit lives in code — no way to overspend." |
+| 44–60 | 4 · «Built in one night» + закрытие | "We built this in one night, and it works end to end — a real Stripe payment, four stores, finished deals. It's all in our video. You set the budget. Your elf does the shopping. Shop Elf." |
 
-~145 слов. Репетировать вслух с таймером; переключение слайдов: → / пробел / клик.
-Блок 3 дословно бьёт в «What wins this topic» со страницы кейса: no human pressing buttons · caps hold (enforced in code) · nothing pays twice.
+~150 слов, без жаргона; «limit lives in code» и «money comes back» — это ответы на чек-лист жюри
+(caps hold / no human pressing buttons / nothing pays twice) обычными словами.
 
 ## Что честно говорим про ограничения (критерий 5, 10%)
 

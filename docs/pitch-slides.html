@@ -27,90 +27,92 @@
   .dots i { width: 1.2vh; height: 1.2vh; border-radius: 50%; background: var(--border); }
   .dots i.on { background: var(--indigo-soft); }
 
-  /* slide 1 — hook */
+  h1.big { font-size: 8.5vh; font-weight: 760; line-height: 1.18; }
+  .no { color: var(--red); }
   .hook-elf { font-size: 11vh; margin-bottom: 4vh; }
-  .hook h1 { font-size: 9vh; font-weight: 760; line-height: 1.15; letter-spacing: .005em; }
-  .hook h1 .no { color: var(--red); }
 
-  /* slide 2 — map */
-  .map h1 { font-size: 5.6vh; font-weight: 740; margin-bottom: 1.6vh; }
-  .map .sub { font-size: 3vh; color: var(--muted); margin-bottom: 7vh; }
-  .map .sub b { color: var(--fg); }
-  .row { display: flex; align-items: stretch; gap: 1.6vw; justify-content: center; width: 100%; }
-  .node {
-    background: var(--card); border: 1px solid var(--border); border-radius: 2.2vh;
-    padding: 3.4vh 1.6vw; min-width: 13vw; display: flex; flex-direction: column; gap: 1.2vh;
-    align-items: center; justify-content: center;
+  .brand { font-size: 6vh; font-weight: 750; margin-bottom: 1.2vh; }
+  .brand span { color: var(--indigo-soft); }
+  .sub { font-size: 3.2vh; color: var(--muted); margin-bottom: 6.5vh; }
+
+  .row { display: flex; align-items: stretch; gap: 2vw; justify-content: center; width: 100%; }
+  .step {
+    background: var(--card); border: 1px solid var(--border); border-radius: 2.4vh;
+    padding: 4vh 2vw; width: 24vw; display: flex; flex-direction: column; gap: 1.6vh;
+    align-items: center; justify-content: flex-start;
   }
-  .node .ico { font-size: 6vh; }
-  .node .t { font-size: 3vh; font-weight: 680; white-space: nowrap; }
-  .node .d { font-size: 2.1vh; color: var(--muted); line-height: 1.35; }
-  .node.hero {
-    border-color: color-mix(in srgb, var(--indigo) 60%, var(--border));
-    background: linear-gradient(180deg, color-mix(in srgb, var(--indigo) 15%, var(--card)), var(--card));
-    box-shadow: 0 0 7vh rgba(99,102,241,.25);
+  .step .ico { font-size: 7vh; }
+  .step .t { font-size: 3.2vh; font-weight: 680; }
+  .step .d { font-size: 2.4vh; color: var(--muted); line-height: 1.4; }
+  .bubble {
+    font-size: 2.3vh; color: var(--fg); background: #1d2335; border: 1px solid var(--border);
+    border-radius: 1.6vh; padding: 1.4vh 1.2vw; font-style: italic;
   }
   .arr { align-self: center; font-size: 4.5vh; color: var(--indigo-soft); }
 
-  /* slide 3 — trust */
-  .trust h1 { font-size: 7vh; font-weight: 750; line-height: 1.2; margin-bottom: 1.2vh; }
-  .trust h1 .a { color: var(--amber); }
-  .trust h1 .b { color: var(--indigo-soft); }
-  .trust .sub { font-size: 3.1vh; color: var(--muted); margin-bottom: 6.5vh; }
-  .flow { display: flex; align-items: center; gap: 1.2vw; margin-bottom: 5.5vh; }
+  .flow { display: flex; align-items: center; gap: 1.4vw; margin-bottom: 6vh; }
   .pill {
-    font-size: 3vh; font-weight: 720; letter-spacing: .06em; padding: 1.6vh 1.8vw;
+    font-size: 3.4vh; font-weight: 720; letter-spacing: .04em; padding: 2vh 2.4vw;
     border-radius: 99px; border: 2px solid var(--border);
   }
-  .pill.money { color: var(--green); border-color: color-mix(in srgb, var(--green) 60%, transparent); }
+  .pill.g { color: var(--green); border-color: color-mix(in srgb, var(--green) 60%, transparent); }
   .pill.fill { background: color-mix(in srgb, var(--green) 16%, transparent); }
-  .flow .sep { color: var(--muted); font-size: 3.4vh; }
-  .facts { font-size: 2.8vh; color: var(--muted); line-height: 1.7; }
+  .flow .sep { color: var(--muted); font-size: 3.6vh; }
+  .facts { font-size: 3vh; color: var(--muted); line-height: 1.8; }
   .facts b { color: var(--fg); font-weight: 640; }
-  .facts .x { color: var(--red); font-weight: 700; }
+
+  .close-line { font-size: 5vh; font-weight: 700; line-height: 1.4; margin-top: 5vh; }
+  .close-line .elf { font-size: 5.5vh; }
 </style>
 </head>
 <body>
 
-<section class="slide hook active">
+<!-- 1 · hook -->
+<section class="slide active">
   <div class="hook-elf">🧝</div>
-  <h1>Your agent can choose.<br><span class="no">It can&rsquo;t pay.</span></h1>
+  <h1 class="big">Your agent can choose.<br><span class="no">It can&rsquo;t pay.</span></h1>
 </section>
 
-<section class="slide map">
-  <h1>Shop Elf<span style="color:var(--indigo-soft)">.</span></h1>
-  <div class="sub"><b>A marketplace where agents buy from agents</b> — with real money.</div>
+<!-- 2 · product -->
+<section class="slide">
+  <div class="brand">Shop Elf<span>.</span></div>
+  <div class="sub">Your buying agent — on a marketplace of stores.</div>
   <div class="row">
-    <div class="node"><div class="ico">👤</div><div class="t">You</div><div class="d">fund the wallet,<br>say what you need</div></div>
+    <div class="step"><div class="ico">💰</div><div class="t">Put money in</div><div class="d">one top-up,<br>one spending limit</div></div>
     <div class="arr">→</div>
-    <div class="node"><div class="ico">🧝</div><div class="t">Your Elf</div><div class="d">finds stores,<br>compares, buys</div></div>
+    <div class="step"><div class="ico">✍️</div><div class="t">Say what you need</div>
+      <div class="bubble">&ldquo;Order 5 packs of A4 paper,<br>deliver by Thursday&rdquo;</div></div>
     <div class="arr">→</div>
-    <div class="node hero"><div class="ico">🏛️</div><div class="t">Platform</div><div class="d">wallet · escrow<br>· ledger</div></div>
-    <div class="arr">→</div>
-    <div class="node"><div class="ico">🤖</div><div class="t">Store agents</div><div class="d">quote, fulfil,<br>prove delivery</div></div>
-    <div class="arr">→</div>
-    <div class="node"><div class="ico">🏪</div><div class="t">Stores</div><div class="d">plug in: public API<br>+ one webhook</div></div>
+    <div class="step"><div class="ico">🧝</div><div class="t">The elf buys</div><div class="d">finds stores, compares<br>offers, completes the deal</div></div>
   </div>
 </section>
 
-<section class="slide trust">
-  <h1><span class="a">Agents propose.</span> <span class="b">The platform decides.</span></h1>
-  <div class="sub">Money moves only through deterministic code — the LLM never touches a cent.</div>
+<!-- 3 · money -->
+<section class="slide">
+  <div class="brand">The elf never holds the money<span>.</span></div>
+  <div class="sub">The platform does — and pays the store only after delivery.</div>
   <div class="flow">
-    <span class="pill">QUOTES</span><span class="sep">→</span>
-    <span class="pill money">HOLD</span><span class="sep">→</span>
-    <span class="pill">ORDER</span><span class="sep">→</span>
-    <span class="pill">PROOF</span><span class="sep">→</span>
-    <span class="pill money fill">CAPTURE</span>
+    <span class="pill g">MONEY LOCKED</span><span class="sep">→</span>
+    <span class="pill">DELIVERY CONFIRMED</span><span class="sep">→</span>
+    <span class="pill g fill">STORE PAID</span>
   </div>
   <div class="facts">
-    No human pressing buttons · caps <b>enforced in code</b>, not in the prompt · <b>nothing pays twice</b><br>
-    Store <span class="x">fails</span> → money auto-releases, the elf re-orders on its own.<br>
-    <b>Built overnight · ran live end-to-end · real Stripe (test mode) · 4 stores</b>
+    Store <b style="color:var(--red)">fails</b> → the money comes back, the elf buys from the next store.<br>
+    The spending limit lives <b>in code</b> — the elf cannot overspend.
   </div>
 </section>
 
-<div class="dots"><i class="on"></i><i></i><i></i></div>
+<!-- 4 · proof + close -->
+<section class="slide">
+  <h1 class="big" style="font-size:7vh; margin-bottom:4.5vh">Built in one night.</h1>
+  <div class="facts" style="font-size:3.2vh">
+    Works end to end · real Stripe payment (test mode)<br>
+    4 stores · finished deals — all in the video
+  </div>
+  <div class="close-line">You set the budget.<br><span class="elf">🧝</span> Your elf does the shopping.</div>
+</section>
+
+<div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
 
 <script>
   const slides = [...document.querySelectorAll('.slide')];
