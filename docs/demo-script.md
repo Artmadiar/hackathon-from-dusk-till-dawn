@@ -1,8 +1,16 @@
-# Презентация: 90-сек видео + 60-сек лайв (правила организатора от 9 окт)
+# Презентация: 90-сек видео + 60-сек питч (правила организатора от 9 окт)
 
-Цель обоих форматов — за секунды показать: **агенты покупают за реальные деньги сами,
-человек только пополняет кошелёк и задаёт политику**. Критерии жюри: working e2e (35%) +
-value (25%) — всё время экрана тратим на работающий сквозной прогон.
+Разделение ролей (уточнение организаторов, утро 9 окт):
+- **Видео 90с** — explainer для жюри: что построено за ночь, можно технично. Сюда — весь
+  сквозной прогон (working e2e 35% + technical 20% + validation 10%).
+- **Питч 60с** — продажа идеи: relevance, value, originality (25% + 10%). Будет 40+ питчей
+  по минуте подряд — в голове жюри должны остаться **два месседжа**, а не демо.
+
+Два месседжа (одни и те же в видео и в питче):
+1. **Human funds once, agents do the buying** — человек пополняет кошелёк и задаёт политику,
+   дальше агенты покупают у агентов за реальные деньги сами.
+2. **Agents propose, the platform decides** — LLM не трогает деньги: холд, двойной леджер,
+   автопереключение на следующий магазин — детерминированный код.
 
 ## Подготовка (до записи / до выхода)
 
@@ -11,7 +19,7 @@ value (25%) — всё время экрана тратим на работаю�
   (обычно Papírna: http://localhost:3390/dashboard) · ④ Admin journal.
 - Три identity в account switcher залогинены заранее (buyer / provider / admin).
 - Кошелёк уже пополнен через Stripe (чек в видео показываем, в лайве — уже готовый баланс).
-- Лайв — fake-LLM (мгновенно); видео — реальный прогон `demo:real` (честно, стабильно 3/3).
+- Видео — реальный прогон `demo:real` (честно, стабильно 3/3). Лайв-среда — запасная, fake-LLM (мгновенно).
 
 ## Видео, 90 секунд (раскадровка)
 
@@ -27,17 +35,32 @@ value (25%) — всё время экрана тратим на работаю�
 
 Приёмы: курсор не ищет — всё в закладках; монтаж жмёт паузы; на 38–66 можно x1.5.
 
-## Лайв, 60 секунд
+## Питч, 60 секунд (без лайв-демо)
 
-1. **0–10** — одна фраза питча (та же, что в видео) + экран Buyer home уже открыт.
-2. **10–35** — вживую: вставить текст задачи → Create → степпер и офферы на глазах →
-   вкладка ③: заказ появился в бэк-офисе магазина (автообновление 5 сек).
-3. **35–50** — вкладка ④ Admin: показать hold → capture, одна фраза: "money is held by the
-   platform, LLMs only propose — and if a store fails, the agent switches to the next one."
-4. **50–60** — закрытие: "One top-up, policy-bounded autonomous purchasing. Everything you saw
-   is running live; only Stripe is test mode, marked SIMULATED where it matters."
+Экран: один заранее открытый кадр — Task page завершённой сделки (степпер DONE, офферы
+четырёх магазинов, SETTLED). Вкладки не переключаем, курсором не водим: всё время — на речь.
 
-Запасной план: если лайв падает — показать видео ещё раз с живым комментарием по вкладкам.
+Текст (EN, ~140 слов, обычный темп):
+
+> **0–8 · Hook.** "Every AI-agent demo ends the same way: the agent decides — and a human
+> pulls out a credit card. The agentic economy stops at checkout."
+>
+> **8–25 · Что это (месседж 1).** "Agentic Procurement is a marketplace where agents buy
+> from agents with real money. You top up a wallet once, set a spending policy — and your
+> agent discovers stores, compares offers and pays on its own, within your limits."
+>
+> **25–42 · Почему безопасно (месседж 2).** "What makes it safe: agents propose, the
+> platform decides. Money only moves through deterministic code — escrow holds, a
+> double-entry ledger, automatic failover to the next store when one drops out. The LLM
+> never touches a cent."
+>
+> **42–60 · Доказательство + закрытие.** "Built overnight and running end-to-end: a real
+> Stripe top-up, four independent stores with their own back offices, settled deals and
+> handled failures — it's all in our 90-second video. One top-up. Policy-bounded autonomous
+> buying. Agentic Procurement."
+
+Запасной план: среда остаётся поднятой (раскладка вкладок ниже) — если жюри задаст вопрос
+или останутся секунды, показываем живой Task page, но питч на это не рассчитывает.
 
 ## Что честно говорим про ограничения (критерий 5, 10%)
 
