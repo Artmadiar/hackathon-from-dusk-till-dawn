@@ -1,5 +1,6 @@
 import { Boxes } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { api, type ProviderView } from './api';
 import { useRoute, navigate } from './router';
 import { useSession } from './session';
 import { useEvents } from './useEvents';
@@ -17,6 +18,11 @@ export function App() {
   const { session, loading, active, switchTo, logout } = useSession();
   /* one SSE subscription for the whole app; the server filters by active identity (R8) */
   const events = useEvents({ enabled: Boolean(active), identityKey: active?.id });
+  const [registry, setRegistry] = useState<ProviderView[]>([]);
+  useEffect(() => {
+    if (active?.role === 'provider') void api<ProviderView[]>('GET', '/providers').then(setRegistry).catch(() => {});
+  }, [active?.id, active?.role]);
+  const onboarded = active?.role === 'provider' && registry.some((p) => p.id === active.providerId);
 
   const isLogin = route.parts[0] === 'login';
   useEffect(() => {
@@ -46,7 +52,7 @@ export function App() {
     : active.role === 'admin'
       ? [{ href: '#/admin', label: 'Admin', current: true }]
       : [{ href: '#/provider', label: 'Dashboard', current: route.parts[1] !== 'onboard' },
-         { href: '#/provider/onboard', label: 'Onboard a store', current: route.parts[1] === 'onboard' }];
+         ...(onboarded ? [] : [{ href: '#/provider/onboard', label: 'Onboard a store', current: route.parts[1] === 'onboard' }])];
 
   return (
     <div className="min-h-screen">

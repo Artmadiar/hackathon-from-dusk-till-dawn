@@ -104,6 +104,18 @@ export function registerPublicRoutes(app: FastifyInstance, deps: Deps): void {
     },
   );
 
+  /** Портал провайдера: свои сделки — статистика, история, причины отмен. */
+  app.get('/provider/deals', async (req, reply) => {
+    const identity = await resolveIdentity(req, deps.auth);
+    if (!identity || identity.role !== 'provider') {
+      return reply.code(identity ? 403 : 401).send({ error: 'provider_required' });
+    }
+    const rows = await deps.db.select().from(deals)
+      .where(eq(deals.providerId, identity.providerId))
+      .orderBy(desc(deals.createdAt)).limit(100);
+    return { deals: rows };
+  });
+
   /** C27: онбординг магазина — появляется в discovery без перезапуска. */
   app.post('/providers/onboard', async (req, reply) => {
     const identity = await resolveIdentity(req, deps.auth);

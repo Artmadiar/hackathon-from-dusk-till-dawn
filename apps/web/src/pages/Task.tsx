@@ -9,12 +9,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 type BadgeVariant = 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive';
-const DEAL_BADGE: Record<string, BadgeVariant> = {
+export const DEAL_BADGE: Record<string, BadgeVariant> = {
   QUOTED: 'outline', HELD: 'default', ORDER_PLACED: 'warning', PROOF_RECEIVED: 'default',
   SETTLED: 'success', REJECTED_BY_POLICY: 'destructive', CANCELLED: 'destructive',
 };
 /* Человеческая подпись к статусу сделки — бейдж остаётся, подпись объясняет */
-const DEAL_LABEL: Record<string, string> = {
+export const DEAL_LABEL: Record<string, string> = {
   QUOTED: 'quote received', HELD: 'funds held', ORDER_PLACED: 'order sent to store',
   PROOF_RECEIVED: 'delivery proof received', SETTLED: 'paid & settled',
   REJECTED_BY_POLICY: 'blocked by policy', CANCELLED: 'cancelled',

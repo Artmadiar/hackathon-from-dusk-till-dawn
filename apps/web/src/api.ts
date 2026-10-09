@@ -72,6 +72,17 @@ export interface ProviderView {
   active: boolean;
 }
 
+export interface ProviderDealRow {
+  id: string;
+  taskId: string;
+  providerId: string;
+  status: string;
+  quote: { total: number; deliveryEta: string; lines: Array<{ sku: string; title: string; unitPrice: number; quantity: number; lineTotal: number }> };
+  cancelReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AdminBuyerRow {
   id: string; name: string; email: string;
   balance: number; held: number;

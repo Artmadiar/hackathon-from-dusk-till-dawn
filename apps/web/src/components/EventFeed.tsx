@@ -228,9 +228,10 @@ function FeedGroup({ title, defaultOpen, children }: {
   );
 }
 
-/** Лента, сгруппированная по задачам: свежая группа раскрыта, остальные — по клику. */
-export function GroupedEventFeed({ events, tasks, empty }: {
-  events: EventView[]; tasks: Map<string, TaskView>; empty?: string;
+/** Лента, сгруппированная по задачам. startCollapsed — компактный режим (buyer home). */
+export function GroupedEventFeed({ events, tasks, empty, startCollapsed, linkTasks = true }: {
+  events: EventView[]; tasks?: Map<string, TaskView>; empty?: string;
+  startCollapsed?: boolean; linkTasks?: boolean;
 }) {
   if (!events.length) {
     return <div className="py-8 text-center text-sm text-muted-foreground">{empty ?? 'Nothing yet — events stream in live.'}</div>;
@@ -247,15 +248,17 @@ export function GroupedEventFeed({ events, tasks, empty }: {
   return (
     <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto pr-1">
       {groups.map((g, i) => {
-        const t = tasks.get(g.taskId);
+        const t = tasks?.get(g.taskId);
         const title = g.taskId ? (
           <>
             <span className="min-w-0 truncate text-sm font-semibold">
-              {t ? t.request.items.map((x) => x.itemQuery).join(', ') : 'Task'}
+              {t ? t.request.items.map((x) => x.itemQuery).join(', ') : `Task ${shortId(g.taskId)}`}
             </span>
             {t && <Badge variant={TASK_BADGE[t.status]}>{t.status}</Badge>}
-            <a className="text-xs text-primary hover:underline" href={`#/task/${g.taskId}`}
-              onClick={(e) => e.stopPropagation()}>open →</a>
+            {linkTasks && (
+              <a className="text-xs text-primary hover:underline" href={`#/task/${g.taskId}`}
+                onClick={(e) => e.stopPropagation()}>open →</a>
+            )}
             <span className="text-[11px] text-muted-foreground">{g.events.length}</span>
           </>
         ) : (
@@ -265,7 +268,7 @@ export function GroupedEventFeed({ events, tasks, empty }: {
           </>
         );
         return (
-          <FeedGroup key={g.taskId || 'platform'} title={title} defaultOpen={i === 0}>
+          <FeedGroup key={g.taskId || 'platform'} title={title} defaultOpen={!startCollapsed && i === 0}>
             {[...g.events].reverse().map((e) => <EventRow key={e.id} e={e} />)}
           </FeedGroup>
         );

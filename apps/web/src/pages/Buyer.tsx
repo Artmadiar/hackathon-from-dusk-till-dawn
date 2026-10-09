@@ -144,10 +144,10 @@ export function BuyerPage({ events }: { events: EventView[] }) {
               <Activity className="size-4 text-primary" /> Activity
               <span className="ml-1 size-2 animate-pulse rounded-full bg-success" title="live" />
             </CardTitle>
-            <CardDescription>Grouped by task. Other agents’ internals stay hidden — filtered on the server.</CardDescription>
+            <CardDescription>Grouped by task — click a group to expand. Only your events reach this feed.</CardDescription>
           </CardHeader>
           <CardContent>
-            <GroupedEventFeed events={events} tasks={taskMap} />
+            <GroupedEventFeed events={events} tasks={taskMap} startCollapsed />
           </CardContent>
         </Card>
       </div>
