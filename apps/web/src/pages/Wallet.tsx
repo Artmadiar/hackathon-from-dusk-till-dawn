@@ -30,6 +30,8 @@ export function WalletPage({ events, query }: { events: EventView[]; query: URLS
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
+  const MONEY_TYPES = ['DEPOSIT', 'HOLD_PLACED', 'HOLD_RELEASE', 'CAPTURE'];
+  const money = useMemo(() => events.filter((e) => MONEY_TYPES.includes(e.type)), [events]);
   const deposits = useMemo(() => events.filter((e) => e.type === 'DEPOSIT'), [events]);
   const pendingTopup = query.get('topup') === 'pending';
   const [returnedAt] = useState(Date.now());
@@ -104,19 +106,34 @@ export function WalletPage({ events, query }: { events: EventView[]; query: URLS
       </div>
 
       <Card>
-        <CardHeader><CardTitle>Wallet activity</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Money history</CardTitle>
+          <CardDescription>Every movement: top-ups, holds your agent places, payouts to stores.</CardDescription>
+        </CardHeader>
         <CardContent>
-          {!deposits.length && <div className="py-8 text-center text-sm text-muted-foreground">No deposits in this session yet.</div>}
+          {!money.length && <div className="py-8 text-center text-sm text-muted-foreground">No money movements in this session yet.</div>}
           <div className="flex flex-col gap-1.5">
-            {[...deposits].reverse().map((e) => (
-              <div key={e.id} className="flex items-baseline gap-3 rounded-lg border px-3 py-2 text-sm">
-                <span className="text-[11px] tabular-nums text-muted-foreground">{fmtTs(e.ts)}</span>
-                <span className="font-medium tabular-nums">+{usd((e.payload as { amount: number }).amount)}</span>
-                {(e.payload as { simulated?: boolean }).simulated
-                  ? <Badge variant="simulated">SIMULATED</Badge>
-                  : <Badge variant="success">Stripe</Badge>}
-              </div>
-            ))}
+            {[...money].reverse().map((e) => {
+              const amount = (e.payload as { amount?: number }).amount ?? 0;
+              const row: Record<string, { sign: string; label: string; cls: string }> = {
+                DEPOSIT: { sign: '+', label: 'Top-up', cls: 'text-success' },
+                HOLD_PLACED: { sign: '−', label: 'Reserved for a deal (hold)', cls: 'text-warning' },
+                HOLD_RELEASE: { sign: '+', label: 'Hold released back', cls: 'text-muted-foreground' },
+                CAPTURE: { sign: '−', label: 'Paid to the store', cls: '' },
+              };
+              const r = row[e.type]!;
+              return (
+                <div key={e.id} className="flex items-baseline gap-3 rounded-lg border px-3 py-2 text-sm">
+                  <span className="text-[11px] tabular-nums text-muted-foreground">{fmtTs(e.ts)}</span>
+                  <span className={`w-20 text-right font-semibold tabular-nums ${r.cls}`}>{r.sign}{usd(amount)}</span>
+                  <span className="min-w-0 flex-1 truncate">{r.label}</span>
+                  {e.type === 'DEPOSIT' && ((e.payload as { simulated?: boolean }).simulated
+                    ? <Badge variant="simulated">SIMULATED</Badge>
+                    : <Badge variant="success">Stripe</Badge>)}
+                  {e.taskId && <a className="text-xs text-primary hover:underline" href={`#/task/${e.taskId}`}>view task →</a>}
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

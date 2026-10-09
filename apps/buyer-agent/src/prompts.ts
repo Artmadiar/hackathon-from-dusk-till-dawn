@@ -29,7 +29,7 @@ export function parsePrompt(text: string, now: Date): LlmRequest {
     system:
       'Разбери запрос на закупку в структуру. Категории только из enum (paper|writing|water|office). '
       + `Дедлайн — абсолютная дата ISO; относительные сроки считай от ${now.toISOString()}. `
-      + 'Чего в тексте нет — предположи разумно и перечисли каждое предположение в assumptions. '
+      + 'Чего в тексте нет — предположи разумно и перечисли каждое предположение в assumptions, по-английски (UI англоязычный). '
       + 'Бюджет бери только если пользователь назвал его сам, иначе budgetUsd: null. Ответь только вызовом parse_task.',
     messages: [{ role: 'user', content: text }],
     tools: [PARSE_TOOL],

@@ -5,7 +5,7 @@ import { EventFeed } from '../components/EventFeed';
 import { useEvents } from '../useEvents';
 import { TASK_BADGE } from '../components/EventFeed';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 type BadgeVariant = 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive';
@@ -106,6 +106,10 @@ export function TaskPage({ taskId }: { taskId: string }) {
 
       <div className="grid items-start gap-4 lg:grid-cols-[400px_1fr]">
         <div className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-sm font-semibold">Offers from stores{deals.length ? ` (${deals.length})` : ''}</h2>
+            <p className="text-xs text-muted-foreground">Quotes your agent collected — the accepted one is highlighted.</p>
+          </div>
           {sorted.map((d) => (
             <Card key={d.id} className={ACTIVE_DEAL.has(d.status) ? 'border-primary/60 shadow-md' : undefined}>
               <CardHeader>
@@ -144,7 +148,10 @@ export function TaskPage({ taskId }: { taskId: string }) {
         </div>
 
         <Card>
-          <CardHeader><CardTitle>Task timeline</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Task timeline</CardTitle>
+            <CardDescription>Every step the agents and the platform took, newest first.</CardDescription>
+          </CardHeader>
           <CardContent><EventFeed events={events} /></CardContent>
         </Card>
       </div>

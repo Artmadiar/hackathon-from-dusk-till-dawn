@@ -82,7 +82,7 @@ export class BuyerRunner {
       await platform.updateBudget(input.taskId, req.budget);
       await emit('DECISION', {
         step: 'estimate_budget',
-        reasoning: `ожидаю ${est.data.lowUsd}–${est.data.highUsd} $, потолок ${(max / 100).toFixed(2)} $`,
+        reasoning: `expecting $${est.data.lowUsd}–$${est.data.highUsd}, capped at $${(max / 100).toFixed(2)} by policy`,
         budget: req.budget,
       });
     }

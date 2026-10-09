@@ -59,7 +59,7 @@ function GroupedJournal({ events, tasks }: { events: EventView[]; tasks: Map<str
               <span className="ml-auto text-[11px] text-muted-foreground">{g.events.length} events</span>
             </div>
             <div className="flex flex-col gap-1.5">
-              {[...g.events].reverse().map((e) => <EventRow key={e.id} e={e} />)}
+              {[...g.events].reverse().map((e) => <EventRow key={e.id} e={e} raw />)}
             </div>
           </div>
         );
@@ -262,7 +262,7 @@ export function AdminPage({ events }: { events: EventView[] }) {
             {grouped
               ? <GroupedJournal events={filtered} tasks={taskMap} />
               : <div className="flex max-h-[65vh] flex-col gap-1.5 overflow-y-auto pr-1">
-                  {[...filtered].reverse().map((e) => <EventRow key={e.id} e={e} showTask />)}
+                  {[...filtered].reverse().map((e) => <EventRow key={e.id} e={e} showTask raw />)}
                 </div>}
           </CardContent>
         </Card>

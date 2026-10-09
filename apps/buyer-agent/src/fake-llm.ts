@@ -36,7 +36,7 @@ export function fakeBuyerLlm(): Llm {
             input: {
               lowUsd: Math.floor(total * 0.9) / 100,
               highUsd: Math.ceil(total * 1.2) / 100,
-              reasoning: 'словарь demo-цен (LLM=fake)',
+              reasoning: 'demo price table (LLM=fake)',
             },
           }],
         };
@@ -75,7 +75,7 @@ function category(s: string): string | undefined {
 function fakeParse(text: string, req: LlmRequest): Record<string, unknown> | undefined {
   const nowMatch = (req.system ?? '').match(/от (\d{4}-\d{2}-\d{2}T[\d:.]+Z)/);
   const now = nowMatch ? new Date(nowMatch[1]!) : new Date();
-  const assumptions: string[] = ['LLM=fake: разбор эвристикой, не моделью'];
+  const assumptions: string[] = ['LLM=fake: parsed heuristically, not by a model'];
 
   const budgetMatch = text.match(/бюджет\D{0,10}(\d+)/i) ?? text.match(/(\d+)\s*(?:доллар|\$|usd)/i);
   const budgetUsd = budgetMatch ? Number(budgetMatch[1]) : null;
@@ -87,17 +87,17 @@ function fakeParse(text: string, req: LlmRequest): Record<string, unknown> | und
       do { d.setUTCDate(d.getUTCDate() + 1); } while (d.getUTCDay() !== w.dow);
       d.setUTCHours(17, 0, 0, 0);
       deadline = d;
-      assumptions.push(`дедлайн: ближайший такой день недели, 17:00 UTC (${d.toISOString()})`);
+      assumptions.push(`deadline: nearest requested weekday, 17:00 UTC (${d.toISOString()})`);
       break;
     }
   }
   if (!deadline && /завтра/i.test(text)) {
     deadline = new Date(now.getTime() + 86400_000);
-    assumptions.push('дедлайн: завтра, то же время');
+    assumptions.push('deadline: tomorrow, same time of day');
   }
   if (!deadline) {
     deadline = new Date(now.getTime() + 3 * 86400_000);
-    assumptions.push('дедлайн не назван — взял +3 дня');
+    assumptions.push('no deadline given — assumed +3 days');
   }
 
   const cleaned = text
