@@ -60,7 +60,7 @@ export function App() {
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
           <a href="#/" className="flex items-center gap-2 font-semibold tracking-tight">
             <Boxes className="size-5 text-primary" />
-            Office Elf
+            Shop Elf
           </a>
           <nav className="flex items-center gap-1">
             {nav.map((n) => (

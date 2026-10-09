@@ -36,7 +36,7 @@
 | 38–52 | Task page: степпер бежит, карточки офферов 4 магазинов с именами и ценами | "The platform discovers four independent stores; their agents quote in seconds. The buyer agent compares price, delivery and rating." |
 | 52–66 | Момент решения: HELD → ORDER_PLACED; переключение на Back office магазина — заказ прилетел, invoice | "The platform — deterministic code, not the LLM — holds the funds and places the order. Here's the store's own back office: the order just arrived in *their* system." |
 | 66–78 | Proof → SETTLED; Admin: hold → capture; failure-флеш 3 сек (offer withdrawn → агент к следующему) | "Delivery proof comes back, the hold is captured to the store's wallet — double-entry ledger, every event logged. And if a store fails, funds release and the agent re-orders elsewhere." |
-| 78–90 | Финальный кадр: снова слайд-схема | "Everything you saw ran live. Stripe is test mode — labeled SIMULATED; settlement is our own double-entry ledger; the four stores are demo instances wired as external businesses. Next: a new domain is just a new contract type. Office Elf." |
+| 78–90 | Финальный кадр: снова слайд-схема | "Everything you saw ran live. Stripe is test mode — labeled SIMULATED; settlement is our own double-entry ledger; the four stores are demo instances wired as external businesses. Next: a new domain is just a new contract type. Shop Elf." |
 
 Приёмы: курсор не ищет — всё в закладках; монтаж жмёт паузы; на 38–66 можно x1.5.
 
@@ -50,7 +50,7 @@
 > **0–8 · Hook.** "Every AI-agent demo ends the same way: the agent decides — and a human
 > pulls out a credit card. The agentic economy stops at checkout."
 >
-> **8–25 · Что это (месседж 1).** "Office Elf is a marketplace where agents buy
+> **8–25 · Что это (месседж 1).** "Shop Elf is a marketplace where agents buy
 > from agents with real money. You top up a wallet once, set a spending policy — and your
 > agent discovers stores, compares offers and pays on its own, within your limits."
 >
@@ -62,7 +62,7 @@
 > **42–60 · Доказательство + закрытие.** "Built overnight and running end-to-end: a real
 > Stripe top-up, four independent stores with their own back offices, settled deals and
 > handled failures — it's all in our 90-second video. One top-up. Policy-bounded autonomous
-> buying. Office Elf."
+> buying. Shop Elf."
 
 Запасной план: среда остаётся поднятой (раскладка вкладок ниже) — если жюри задаст вопрос
 или останутся секунды, показываем живой Task page, но питч на это не рассчитывает.
