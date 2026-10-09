@@ -14,5 +14,8 @@
     "e2e:up": "PLATFORM_DB=platform_e2e STRIPE_WEBHOOK_SECRET=whsec_e2e docker compose --profile core --profile test up -d --build --wait",
     "e2e:run": "pnpm --filter @fdtd/e2e scenarios",
     "e2e:down": "PLATFORM_DB=platform_e2e docker compose --profile core --profile test down"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.0"
   }
 }
