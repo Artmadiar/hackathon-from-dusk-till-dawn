@@ -22,23 +22,22 @@
 - Кошелёк уже пополнен через Stripe (чек в видео показываем, в лайве — уже готовый баланс).
 - Видео — реальный прогон `demo:real` (честно, стабильно 3/3). Лайв-среда — запасная, fake-LLM (мгновенно).
 
-## Видео, 90 секунд (раскадровка)
+## Видео, 90 секунд — ФИНАЛ (записано 9 окт ~06:15, реальный LLM + реальный Stripe test-mode)
 
-Структура с формы сабмишна (hq.agents007.ai/submit, «Show it working, not slides»):
-15с проблема → 60с живое демо полного сценария → 15с «что реально / что симулировано / что дальше».
-Наши слайд-кадры укладываются в первые и последние 15 секунд; середина — только живой продукт.
+Видеоряд записан скриптом (Playwright), файл: scratchpad/demo-silent.mp4 (немой мастер).
+Голос пишет Азамат на телефон 7 блоками; блоки выравниваются по началу отрезков при склейке.
 
-| Время | Экран | Текст за кадром (EN) |
+| Сек | Экран | Текст блока (EN) |
 |---|---|---|
-| 0–10 | **Слайд-схема** (`docs/video-slide.html` фуллскрин): Buyers ↔ Platform ↔ Providers, агенты с двух сторон, флоу REQUEST→CAPTURE | "AI agents can decide — but when it's time to pay, a human still pulls out a card. We built a marketplace where agents buy from agents with real money, safely. Here's the map — now watch it run." |
-| 10–22 | Wallet: Stripe top-up уже сделан, баланс + policy | "You top up a wallet once — real Stripe checkout — and set a spending policy. From here on, your agent spends on its own, within limits." |
-| 22–38 | (2-сек флеш #/stores — витрина подключённых магазинов) → Buyer home: ввод текста → Fill from text → структура → Create | "You just say what you need. The agent turns free text into a structured request — budget, deadline, categories." |
-| 38–52 | Task page: степпер бежит, карточки офферов 4 магазинов с именами и ценами | "The platform discovers four independent stores; their agents quote in seconds. The buyer agent compares price, delivery and rating." |
-| 52–66 | Момент решения: HELD → ORDER_PLACED; переключение на Back office магазина — заказ прилетел, invoice | "The platform — deterministic code, not the LLM — holds the funds and places the order. Here's the store's own back office: the order just arrived in *their* system." |
-| 66–78 | Proof → SETTLED; Admin: hold → capture; failure-флеш 3 сек (offer withdrawn → агент к следующему) | "Delivery proof comes back, the hold is captured to the store's wallet — double-entry ledger, every event logged. And if a store fails, funds release and the agent re-orders elsewhere." |
-| 78–90 | Финальный кадр: снова слайд-схема | "Everything you saw ran live. Stripe is test mode — labeled SIMULATED; settlement is our own double-entry ledger; the four stores are demo instances wired as external businesses. Next: a new domain is just a new contract type. Shop Elf." |
+| 0–10 | Слайд-схема Shop Elf | "AI agents can decide. But to pay, a human still pulls out a card. Shop Elf is a marketplace where agents buy from agents — with real money." |
+| 10–20 | Кошелёк: $100, история с бейджем Stripe | "You top up a wallet once — a real Stripe checkout — and set a spending limit. From now on, your agent spends on its own, within that limit." |
+| 20–36 | Stores (витрина) → ввод текста → драфт → start the agent | "These are the connected stores, with live catalogs. You just type what you need. The agent turns it into a real order: items, budget, deadline." |
+| 36–47 | Офферы 3 магазинов; Papírna отваливается out-of-stock | "Three stores send their offers in seconds. The agent compares price, delivery and rating — and picks the best one." |
+| 47–57 | Бэк-офис Kancelář Plus: заказ прилетел, confirmed | "Now the platform holds the money and places the order. This is code, not AI — the AI never touches money. And here is the store's own system: the order just arrived." |
+| 57–76 | SETTLED + зелёный степпер; админ: hold → capture, deposit via Stripe | "The store confirms delivery, and the money moves to its wallet. If a store fails, the money comes back — and the agent orders from the next one." |
+| 76–90 | Финальный слайд с названием | "Everything you saw ran live. Only Stripe is in test mode — marked as simulated. Shop Elf: humans fund it, agents do the buying." |
 
-Приёмы: курсор не ищет — всё в закладках; монтаж жмёт паузы; на 38–66 можно x1.5.
+Запись голоса: тихо, телефон близко, пауза 1–2 сек между блоками; сбился — повтори блок, лишнее вырежется.
 
 ## Питч, 60 секунд (без лайв-демо)
 
