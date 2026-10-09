@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { api, usd, type DealView, type ProviderView, type TaskView } from '../api';
 import { EventFeed } from '../components/EventFeed';
 import { useEvents } from '../useEvents';
-import { TASK_BADGE } from './Buyer';
+import { TASK_BADGE } from '../components/EventFeed';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';

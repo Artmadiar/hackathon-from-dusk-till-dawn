@@ -8,7 +8,7 @@ import { IdentityMenu } from './components/IdentityMenu';
 import { AdminPage } from './pages/Admin';
 import { BuyerPage } from './pages/Buyer';
 import { LoginPage } from './pages/Login';
-import { ProviderPage } from './pages/Provider';
+import { OnboardStorePage, ProviderPage } from './pages/Provider';
 import { TaskPage } from './pages/Task';
 import { WalletPage } from './pages/Wallet';
 
@@ -31,7 +31,8 @@ export function App() {
       case 'wallet': return <WalletPage events={events} query={route.query} />;
       case 'task': return <TaskPage taskId={route.parts[1] ?? ''} />;
       case 'admin': return <AdminPage events={events} />;
-      case 'provider': return <ProviderPage events={events} />;
+      case 'provider':
+        return route.parts[1] === 'onboard' ? <OnboardStorePage /> : <ProviderPage events={events} />;
       default:
         if (active.role === 'admin') return <AdminPage events={events} />;
         if (active.role === 'provider') return <ProviderPage events={events} />;
@@ -44,7 +45,8 @@ export function App() {
        { href: '#/wallet', label: 'Wallet', current: route.parts[0] === 'wallet' }]
     : active.role === 'admin'
       ? [{ href: '#/admin', label: 'Admin', current: true }]
-      : [{ href: '#/provider', label: 'Provider portal', current: true }];
+      : [{ href: '#/provider', label: 'Dashboard', current: route.parts[1] !== 'onboard' },
+         { href: '#/provider/onboard', label: 'Onboard a store', current: route.parts[1] === 'onboard' }];
 
   return (
     <div className="min-h-screen">

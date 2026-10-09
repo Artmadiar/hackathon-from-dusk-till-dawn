@@ -1,8 +1,15 @@
-import type { EventView } from '../api';
+import { ChevronDown } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import type { EventView, TaskView } from '../api';
 import { fmtTs, usd } from '../api';
 import { Badge } from '@/components/ui/badge';
 
-type BadgeVariant = 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive' | 'simulated';
+export type BadgeVariant = 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive' | 'simulated';
+
+/* Статусы задач — в одном месте: ими красятся списки, степпер и группы ленты */
+export const TASK_BADGE: Record<TaskView['status'], BadgeVariant> = {
+  OPEN: 'outline', SOURCING: 'default', DECIDING: 'default', ORDERED: 'warning', DONE: 'success', FAILED: 'destructive',
+};
 
 const EVENT_BADGE: Record<string, BadgeVariant> = {
   DEPOSIT: 'success', HOLD_PLACED: 'default', HOLD_RELEASE: 'secondary', CAPTURE: 'success',
@@ -99,6 +106,69 @@ export function EventFeed({ events, showTask, empty }: { events: EventView[]; sh
   return (
     <div className="flex max-h-[70vh] flex-col gap-1.5 overflow-y-auto pr-1">
       {[...events].reverse().map((e) => <EventRow key={e.id} e={e} showTask={showTask} />)}
+    </div>
+  );
+}
+
+/** Сворачиваемая группа; состояние живёт в компоненте — SSE-ререндеры его не сбрасывают. */
+function FeedGroup({ title, defaultOpen, children }: {
+  title: ReactNode; defaultOpen: boolean; children: ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="rounded-xl border bg-muted/20">
+      <button type="button" onClick={() => setOpen(!open)}
+        className="flex w-full flex-wrap items-center gap-2 rounded-xl px-3 py-2 text-left hover:bg-accent/40">
+        {title}
+        <ChevronDown className={`ml-auto size-4 shrink-0 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && <div className="flex flex-col gap-1.5 p-2 pt-0">{children}</div>}
+    </div>
+  );
+}
+
+/** Лента, сгруппированная по задачам: свежая группа раскрыта, остальные — по клику. */
+export function GroupedEventFeed({ events, tasks, empty }: {
+  events: EventView[]; tasks: Map<string, TaskView>; empty?: string;
+}) {
+  if (!events.length) {
+    return <div className="py-8 text-center text-sm text-muted-foreground">{empty ?? 'Nothing yet — events stream in live.'}</div>;
+  }
+  const map = new Map<string, EventView[]>();
+  for (const e of events) {
+    const k = e.taskId ?? '';
+    const list = map.get(k);
+    if (list) list.push(e); else map.set(k, [e]);
+  }
+  const groups = [...map.entries()]
+    .map(([taskId, evs]) => ({ taskId, events: evs, last: evs[evs.length - 1].id }))
+    .sort((a, b) => b.last - a.last);
+  return (
+    <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto pr-1">
+      {groups.map((g, i) => {
+        const t = tasks.get(g.taskId);
+        const title = g.taskId ? (
+          <>
+            <span className="min-w-0 truncate text-sm font-semibold">
+              {t ? t.request.items.map((x) => x.itemQuery).join(', ') : 'Task'}
+            </span>
+            {t && <Badge variant={TASK_BADGE[t.status]}>{t.status}</Badge>}
+            <a className="text-xs text-primary hover:underline" href={`#/task/${g.taskId}`}
+              onClick={(e) => e.stopPropagation()}>open →</a>
+            <span className="text-[11px] text-muted-foreground">{g.events.length}</span>
+          </>
+        ) : (
+          <>
+            <span className="text-sm font-semibold">Wallet & platform</span>
+            <span className="text-[11px] text-muted-foreground">{g.events.length}</span>
+          </>
+        );
+        return (
+          <FeedGroup key={g.taskId || 'platform'} title={title} defaultOpen={i === 0}>
+            {[...g.events].reverse().map((e) => <EventRow key={e.id} e={e} />)}
+          </FeedGroup>
+        );
+      })}
     </div>
   );
 }

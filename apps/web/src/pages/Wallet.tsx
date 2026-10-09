@@ -6,20 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input, Label } from '@/components/ui/input';
 
+/** Акцент на доступной сумме; холд и общий баланс — вторым планом. */
 export function WalletSummary({ wallet }: { wallet: WalletView | null }) {
-  const cell = (label: string, value: number | undefined, accent = false) => (
-    <div className="flex flex-col items-center gap-0.5">
-      <span className={`text-2xl font-bold tabular-nums ${accent ? 'text-primary' : ''}`}>
-        {wallet ? usd(value ?? 0) : '—'}
-      </span>
-      <span className="text-[11px] text-muted-foreground">{label}</span>
-    </div>
-  );
   return (
-    <div className="grid grid-cols-3 gap-2">
-      {cell('balance', wallet?.balance)}
-      {cell('on hold', wallet?.held)}
-      {cell('available', wallet?.available, true)}
+    <div className="flex flex-col gap-0.5">
+      <div className="flex items-baseline gap-2">
+        <span className="text-3xl font-bold tabular-nums text-primary">{wallet ? usd(wallet.available) : '—'}</span>
+        <span className="text-xs text-muted-foreground">available</span>
+      </div>
+      <div className="text-xs tabular-nums text-muted-foreground">
+        {(wallet?.held ?? 0) > 0 && <span className="font-medium text-warning">on hold {usd(wallet!.held)} · </span>}
+        total balance {wallet ? usd(wallet.balance) : '—'}
+      </div>
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import { RotateCcw } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { api, fmtTs, usd, type AdminOverview, type EventView, type TaskView } from '../api';
-import { EventRow, summary } from '../components/EventFeed';
-import { TASK_BADGE } from './Buyer';
+import { EventRow, actorLabel, summary } from '../components/EventFeed';
+import { TASK_BADGE } from '../components/EventFeed';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -213,20 +213,35 @@ export function AdminPage({ events }: { events: EventView[] }) {
 
       <TabsContent value="journal" className="flex flex-col gap-4">
         <Card>
-          <CardHeader><CardTitle>Agents right now</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Agents</CardTitle>
+            <CardDescription>Green = working on a task right now; grey = idle, showing its last action.</CardDescription>
+          </CardHeader>
           <CardContent>
             {!now.length && <div className="py-4 text-center text-sm text-muted-foreground">Agents are quiet — the journal is empty.</div>}
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {now.map((e) => (
-                <div key={e.actor} className="rounded-lg border p-3">
-                  <div className="text-xs font-semibold">{e.actor}</div>
-                  <div className="mt-0.5 truncate text-sm" title={summary(e)}>{summary(e)}</div>
-                  <div className="mt-0.5 text-[11px] text-muted-foreground">
-                    {fmtTs(e.ts)}
-                    {e.taskId && <a className="text-primary hover:underline" href={`#/task/${e.taskId}`}> · view task →</a>}
+              {now.map((e) => {
+                /* агент «в работе», пока его задача не терминальна и событие свежее */
+                const t = e.taskId ? taskMap.get(e.taskId) : undefined;
+                const working = (!t || (t.status !== 'DONE' && t.status !== 'FAILED'))
+                  && Date.now() - new Date(e.ts).getTime() < 30_000;
+                return (
+                  <div key={e.actor} className={`rounded-lg border p-3 ${working ? '' : 'opacity-70'}`}>
+                    <div className="flex items-center gap-1.5 text-xs font-semibold">
+                      <span className={`size-2 rounded-full ${working ? 'animate-pulse bg-success' : 'bg-muted-foreground/40'}`} />
+                      {actorLabel(e.actor)}
+                      {!working && <span className="font-normal text-muted-foreground">idle</span>}
+                    </div>
+                    <div className="mt-0.5 truncate text-sm" title={summary(e)}>
+                      {working ? summary(e) : `last: ${summary(e)}`}
+                    </div>
+                    <div className="mt-0.5 text-[11px] text-muted-foreground">
+                      {fmtTs(e.ts)}
+                      {e.taskId && <a className="text-primary hover:underline" href={`#/task/${e.taskId}`}> · view task →</a>}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
