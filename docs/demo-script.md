@@ -15,7 +15,8 @@
 ## Подготовка (до записи / до выхода)
 
 - `docker compose --profile core --profile dev up -d` — свежие магазины (заказы в памяти, чистые).
-- Вкладки открыты заранее: ① Buyer home · ② Task (откроется) · ③ Back office магазина-победителя
+- Вкладки открыты заранее: ⓪ слайд-схема `docs/video-slide.html` (открыть file://, фуллскрин) ·
+  ① Buyer home · ② Task (откроется) · ③ Back office магазина-победителя
   (обычно Papírna: http://localhost:3390/dashboard) · ④ Admin journal.
 - Три identity в account switcher залогинены заранее (buyer / provider / admin).
 - Кошелёк уже пополнен через Stripe (чек в видео показываем, в лайве — уже готовый баланс).
@@ -25,13 +26,13 @@
 
 | Время | Экран | Текст за кадром (EN) |
 |---|---|---|
-| 0–10 | Логин/лендинг → Buyer home | "AI agents can decide — but when it's time to pay, a human still pulls out a card. We built a marketplace where agents buy from agents with real money, safely." |
+| 0–10 | **Слайд-схема** (`docs/video-slide.html` фуллскрин): Buyers ↔ Platform ↔ Providers, агенты с двух сторон, флоу REQUEST→CAPTURE | "AI agents can decide — but when it's time to pay, a human still pulls out a card. We built a marketplace where agents buy from agents with real money, safely. Here's the map — now watch it run." |
 | 10–22 | Wallet: Stripe top-up уже сделан, баланс + policy | "You top up a wallet once — real Stripe checkout — and set a spending policy. From here on, your agent spends on its own, within limits." |
 | 22–38 | Buyer home: ввод текста → Fill from text → структура → Create | "You just say what you need. The agent turns free text into a structured request — budget, deadline, categories." |
 | 38–52 | Task page: степпер бежит, карточки офферов 4 магазинов с именами и ценами | "The platform discovers four independent stores; their agents quote in seconds. The buyer agent compares price, delivery and rating." |
 | 52–66 | Момент решения: HELD → ORDER_PLACED; переключение на Back office магазина — заказ прилетел, invoice | "The platform — deterministic code, not the LLM — holds the funds and places the order. Here's the store's own back office: the order just arrived in *their* system." |
 | 66–78 | Proof → SETTLED; степпер DONE; Admin: hold → capture в леджере | "Delivery proof comes back, the hold is captured to the store's wallet. Every cent is double-entry ledger, every event logged." |
-| 78–90 | Failure-кейс 3 сек (offer withdrawn → агент к следующему) → финальный кадр с названием | "If a store fails, funds release automatically and the agent re-orders elsewhere. Humans top up; agents do the buying. [Название проекта]" |
+| 78–90 | Failure-кейс 3 сек (offer withdrawn → агент к следующему) → финальный кадр: снова слайд-схема | "If a store fails, funds release automatically and the agent re-orders elsewhere. Humans top up; agents do the buying. Agentic Procurement." |
 
 Приёмы: курсор не ищет — всё в закладках; монтаж жмёт паузы; на 38–66 можно x1.5.
 

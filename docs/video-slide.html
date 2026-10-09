@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic Procurement</title>
+<style>
+  :root {
+    --bg: #0e1016; --card: #161a24; --card2: #1b2030;
+    --border: #2a2f40; --fg: #eef0f6; --muted: #8e93a6;
+    --indigo: #6366f1; --indigo-soft: #a5b4fc;
+    --amber: #f0a832; --green: #34c384; --red: #e5636b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--fg); overflow: hidden;
+    font-family: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* 16:9 stage, letterboxed on any screen */
+  .stage {
+    width: 100vw; height: 56.25vw; max-height: 100vh; max-width: 177.78vh;
+    position: relative; display: flex; flex-direction: column;
+    padding: 3.2% 4% 2.6%;
+    background:
+      radial-gradient(60% 50% at 50% -10%, rgba(99,102,241,.16), transparent 70%),
+      radial-gradient(45% 40% at 85% 110%, rgba(99,102,241,.08), transparent 70%),
+      var(--bg);
+  }
+  .s { font-size: calc(var(--u) * 1px); } /* helper not used; sizes below in cqw */
+  .stage { container-type: size; }
+
+  header { text-align: center; margin-bottom: 2.4cqh; }
+  h1 { font-size: 5.2cqh; font-weight: 750; letter-spacing: .01em; }
+  h1 .dot { color: var(--indigo-soft); }
+  .tagline { margin-top: 1.1cqh; font-size: 3.1cqh; color: var(--muted); font-weight: 450; }
+  .tagline b { color: var(--fg); font-weight: 600; }
+
+  .grid {
+    flex: 1; display: grid; grid-template-columns: 1fr 4.6cqw 1.25fr 4.6cqw 1fr;
+    align-items: stretch; gap: 0;
+  }
+  .col { display: flex; flex-direction: column; gap: 1.6cqh; }
+  .col-title {
+    font-size: 1.9cqh; font-weight: 700; letter-spacing: .14em; color: var(--muted);
+    text-transform: uppercase; text-align: center; margin-bottom: .2cqh;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 1.6cqh;
+    padding: 1.9cqh 2cqh; flex: 1; display: flex; flex-direction: column; justify-content: center;
+  }
+  .card h3 { font-size: 2.8cqh; font-weight: 650; display: flex; align-items: center; gap: 1cqw; }
+  .card p { font-size: 2.3cqh; color: var(--muted); margin-top: .8cqh; line-height: 1.45; }
+  .card p b { color: var(--fg); font-weight: 600; }
+  .emoji { font-size: 3.2cqh; }
+  .chip {
+    font-size: 1.7cqh; font-weight: 700; letter-spacing: .08em; padding: .35cqh .9cqw;
+    border-radius: 99px; margin-left: auto; white-space: nowrap;
+  }
+  .chip.llm { color: var(--amber); border: 1px solid color-mix(in srgb, var(--amber) 55%, transparent); }
+  .chip.det { color: var(--green); border: 1px solid color-mix(in srgb, var(--green) 55%, transparent); }
+
+  .platform {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--indigo) 14%, var(--card)), var(--card));
+    border-color: color-mix(in srgb, var(--indigo) 55%, var(--border));
+    box-shadow: 0 0 6cqh rgba(99,102,241,.22);
+  }
+  .platform ul { list-style: none; margin-top: 1.4cqh; display: flex; flex-direction: column; gap: 1.35cqh; }
+  .platform li { font-size: 2.35cqh; display: flex; gap: 1cqw; align-items: baseline; line-height: 1.35; }
+  .platform li .k { color: var(--indigo-soft); font-weight: 650; white-space: nowrap; }
+  .platform li .v { color: var(--muted); }
+
+  .arrow { display: flex; align-items: center; justify-content: center; }
+  .arrow svg { width: 100%; }
+
+  .stores { display: grid; grid-template-columns: 1fr 1fr; gap: 1cqh 1cqw; margin-top: 1.2cqh; }
+  .store {
+    font-size: 2cqh; font-weight: 600; text-align: center; padding: .9cqh .4cqw;
+    background: var(--card2); border: 1px solid var(--border); border-radius: 1cqh; color: var(--fg);
+  }
+  .store span { display: block; font-size: 1.6cqh; font-weight: 450; color: var(--muted); margin-top: .2cqh; }
+
+  footer { margin-top: 2.4cqh; }
+  .flow {
+    display: flex; align-items: center; justify-content: center; gap: 1cqw;
+    background: var(--card); border: 1px solid var(--border); border-radius: 1.6cqh;
+    padding: 1.6cqh 2cqw;
+  }
+  .step {
+    font-size: 1.9cqh; font-weight: 700; letter-spacing: .06em; padding: .8cqh 1.3cqw;
+    border-radius: 99px; border: 1px solid var(--border); color: var(--fg); white-space: nowrap;
+  }
+  .step.money { color: var(--green); border-color: color-mix(in srgb, var(--green) 60%, transparent); }
+  .step.money.fill { background: color-mix(in srgb, var(--green) 18%, transparent); }
+  .flow .sep { color: var(--muted); font-size: 2.2cqh; }
+  .failover {
+    text-align: center; margin-top: 1.3cqh; font-size: 1.95cqh; color: var(--muted);
+  }
+  .failover b { color: var(--fg); font-weight: 600; }
+  .failover .x { color: var(--red); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <header>
+    <h1>Agentic Procurement<span class="dot">.</span></h1>
+    <div class="tagline"><b>Agents buy from agents with real money.</b> Humans just fund the wallet and set the policy.</div>
+  </header>
+
+  <div class="grid">
+    <!-- BUYERS -->
+    <div class="col">
+      <div class="col-title">Buyers</div>
+      <div class="card">
+        <h3><span class="emoji">👤</span> Human</h3>
+        <p>Tops up the wallet <b>once</b> (Stripe), sets a <b>spending policy</b>, states the need in plain text.</p>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">🤖</span> Buyer Agent <span class="chip llm">LLM&nbsp;· proposes</span></h3>
+        <p>Parses the request, discovers stores, compares quotes — <b>recommends, never pays</b>.</p>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <svg viewBox="0 0 60 24" fill="none"><path d="M4 8h44m0 0-7-6m7 6-7 6" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 16H12m0 0 7-6m-7 6 7 6" stroke="#434a63" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- PLATFORM -->
+    <div class="col">
+      <div class="col-title">The Platform — us</div>
+      <div class="card platform">
+        <h3><span class="emoji">🏛️</span> Deterministic core <span class="chip det">CODE&nbsp;· decides</span></h3>
+        <ul>
+          <li><span class="k">Escrow</span><span class="v">holds funds before any order is placed</span></li>
+          <li><span class="k">Ledger</span><span class="v">double-entry, every cent accounted</span></li>
+          <li><span class="k">Policy</span><span class="v">per-task &amp; total budget limits enforced</span></li>
+          <li><span class="k">Deals</span><span class="v">state machine, idempotent transitions</span></li>
+          <li><span class="k">Contracts</span><span class="v">office-supplies.v1 today — any domain by adding a contract type</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <svg viewBox="0 0 60 24" fill="none"><path d="M4 8h44m0 0-7-6m7 6-7 6" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 16H12m0 0 7-6m-7 6 7 6" stroke="#434a63" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- PROVIDERS -->
+    <div class="col">
+      <div class="col-title">Providers</div>
+      <div class="card">
+        <h3><span class="emoji">🤖</span> Provider Agents <span class="chip llm">LLM&nbsp;· quotes</span></h3>
+        <p>One per store: reads the catalog, quotes by its own rules, fulfils &amp; proves delivery.</p>
+      </div>
+      <div class="card">
+        <h3><span class="emoji">🏪</span> Independent stores</h3>
+        <p>Own back office; onboarded with a <b>public API + one webhook</b>.</p>
+        <div class="stores">
+          <div class="store">Aqua<span>water</span></div>
+          <div class="store">Papírna<span>paper</span></div>
+          <div class="store">Kancelář+<span>office</span></div>
+          <div class="store">Levný sklad<span>discount</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="flow">
+      <span class="step">REQUEST</span><span class="sep">→</span>
+      <span class="step">QUOTES ×4</span><span class="sep">→</span>
+      <span class="step money">HOLD</span><span class="sep">→</span>
+      <span class="step">ORDER</span><span class="sep">→</span>
+      <span class="step">PROOF</span><span class="sep">→</span>
+      <span class="step money fill">CAPTURE</span>
+    </div>
+    <div class="failover">If a store <span class="x">fails</span> — funds auto-release, the agent <b>re-orders from the next one</b>. No human in the loop.</div>
+  </footer>
+</div>
+</body>
+</html>
