@@ -51,6 +51,9 @@ export function createProviderAgent(deps: ProviderAgentDeps): { app: FastifyInst
     rules: { minOrderTotal: deps.rules.minOrderTotal, markupPct: deps.rules.markupPct },
   }));
 
+  /* Каталог магазина глазами агента — публичен, как и у самого магазина */
+  app.get('/catalog', async () => deps.store.catalog());
+
   const requirePlatformJwt = async (req: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const header = req.headers.authorization;
     const token = header?.startsWith('Bearer ') ? header.slice(7) : undefined;

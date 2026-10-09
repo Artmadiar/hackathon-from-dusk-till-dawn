@@ -1,6 +1,6 @@
-import { Bot, Coins, Handshake, ListTodo, RotateCcw, ScrollText, Store, Users } from 'lucide-react';
+import { Bot, ChevronDown, Coins, Handshake, ListTodo, Loader2, RotateCcw, ScrollText, Store, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { api, fmtTs, usd, type AdminOverview, type EventView, type TaskView } from '../api';
+import { api, fmtTs, usd, type AdminOverview, type CatalogItem, type EventView, type TaskView } from '../api';
 import { EventRow, actorLabel, summary } from '../components/EventFeed';
 import { TASK_BADGE } from '../components/EventFeed';
 import { Badge } from '@/components/ui/badge';
@@ -102,48 +102,57 @@ function BuyersTable({ rows }: { rows: AdminOverview['buyers'] }) {
   );
 }
 
-function ProvidersTable({ rows }: { rows: AdminOverview['providers'] }) {
+/** Каталог провайдера живьём — платформа спрашивает его агента при раскрытии. */
+function ProviderCatalog({ providerId }: { providerId: string }) {
+  const [items, setItems] = useState<CatalogItem[] | null>(null);
+  const [err, setErr] = useState('');
+  useEffect(() => {
+    void api<{ items: CatalogItem[] }>('GET', `/providers/${providerId}/catalog`)
+      .then((r) => setItems(r.items))
+      .catch((e) => setErr(String(e)));
+  }, [providerId]);
+  if (err) return <p className="px-3 py-2 text-xs text-destructive">Agent unreachable: {err}</p>;
+  if (!items) return <p className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground"><Loader2 className="size-3.5 animate-spin" /> Asking the store’s agent…</p>;
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Store</TableHead>
-          <TableHead>Rating</TableHead>
-          <TableHead>Categories</TableHead>
-          <TableHead className="text-right">Earned</TableHead>
-          <TableHead>Deals</TableHead>
-          <TableHead>Last deal</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map((p) => (
-          <TableRow key={p.id}>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{p.name}</span>
-                {!p.active && <Badge variant="outline">inactive</Badge>}
-              </div>
-              <div className="text-xs text-muted-foreground">agent · {p.agentUrl}</div>
-            </TableCell>
-            <TableCell><Badge variant={p.rating >= 4 ? 'success' : 'warning'}>{p.rating.toFixed(2)}</Badge></TableCell>
-            <TableCell className="text-xs">{p.categories.join(', ')}</TableCell>
-            <TableCell className="text-right font-semibold tabular-nums">{usd(p.earned)}</TableCell>
-            <TableCell>
-              <div className="flex flex-wrap gap-1">
-                {p.deals.settled > 0 && <Badge variant="success">{p.deals.settled} settled</Badge>}
-                {p.deals.cancelled > 0 && <Badge variant="destructive">{p.deals.cancelled} cancelled</Badge>}
-                {p.deals.total - p.deals.settled - p.deals.cancelled > 0 &&
-                  <Badge variant="outline">{p.deals.total - p.deals.settled - p.deals.cancelled} quoted</Badge>}
-                {p.deals.total === 0 && <span className="text-xs text-muted-foreground">no deals yet</span>}
-              </div>
-            </TableCell>
-            <TableCell className="text-xs text-muted-foreground">
-              {p.lastDealAt ? fmtTs(p.lastDealAt) : '—'}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div className="grid gap-1 px-3 pb-3 sm:grid-cols-2">
+      {items.map((it) => (
+        <div key={it.sku} className="flex items-baseline gap-2 rounded-md border px-2.5 py-1.5 text-xs">
+          <span className="min-w-0 flex-1">
+            <span className="font-medium">{it.title}</span>
+            {it.description && <span className="text-muted-foreground"> — {it.description}</span>}
+          </span>
+          {it.category && <Badge variant="secondary">{it.category}</Badge>}
+          <span className="shrink-0 font-semibold tabular-nums">{usd(it.price)}<span className="font-normal text-muted-foreground"> / {it.unit}</span></span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Строка провайдера: статистика + раскрываемый живой каталог. */
+function ProviderBlock({ p }: { p: AdminOverview['providers'][number] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border">
+      <button type="button" onClick={() => setOpen(!open)}
+        className="flex w-full flex-wrap items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-accent/40">
+        <Store className="size-4 shrink-0 text-primary" />
+        <span className="min-w-0 flex-col">
+          <span className="font-medium">{p.name}</span>
+          <span className="block text-[11px] text-muted-foreground">agent · {p.agentUrl} · {p.categories.join(', ')}</span>
+        </span>
+        <span className="ml-auto flex flex-wrap items-center gap-1.5">
+          <Badge variant={p.rating >= 4 ? 'success' : 'warning'}>★ {p.rating.toFixed(2)}</Badge>
+          {p.deals.settled > 0 && <Badge variant="success">{p.deals.settled} settled</Badge>}
+          {p.deals.cancelled > 0 && <Badge variant="destructive">{p.deals.cancelled} cancelled</Badge>}
+          {p.deals.total - p.deals.settled - p.deals.cancelled > 0 &&
+            <Badge variant="outline">{p.deals.total - p.deals.settled - p.deals.cancelled} quoted</Badge>}
+          <span className="font-semibold tabular-nums">{usd(p.earned)}</span>
+        </span>
+        <ChevronDown className={`size-4 shrink-0 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && <ProviderCatalog providerId={p.id} />}
+    </div>
   );
 }
 
@@ -157,7 +166,11 @@ const JOURNAL_CATS: Array<{ key: string; label: string; icon: typeof Coins; type
   { key: 'agents', label: 'Agent internals', icon: Bot },
 ];
 
-/** Admin: agents, journal, customers, providers — каждый раздел со своей смысловой нагрузкой. */
+const chipCls = (active: boolean) =>
+  `inline-flex h-9 items-center gap-1.5 rounded-full border px-4 text-[13px] font-medium transition-colors ${
+    active ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent'}`;
+
+/** Admin: journal, agents, customers, providers — каждый раздел со своей смысловой нагрузкой. */
 export function AdminPage({ events }: { events: EventView[] }) {
   const [cat, setCat] = useState('all');
   const [actor, setActor] = useState('');
@@ -180,12 +193,20 @@ export function AdminPage({ events }: { events: EventView[] }) {
     (!actor || e.actor === actor)
     && (cat === 'all' || (cat === 'agents' ? e.kind === 'agent' : (activeCat?.types ?? []).includes(e.type))));
 
-  /* the latest agent event per actor = "what is it doing right now" (concept 3.8) */
-  const now = useMemo(() => {
-    const byActor = new Map<string, EventView>();
-    for (const e of events) if (e.kind === 'agent') byActor.set(e.actor, e);
-    return [...byActor.values()];
+  /* последнее событие каждого агента (концепт 3.8) */
+  const lastByActor = useMemo(() => {
+    const m = new Map<string, EventView>();
+    for (const e of events) if (e.kind === 'agent') m.set(e.actor, e);
+    return m;
   }, [events]);
+
+  /* Агентов ровно столько, сколько в реестре + buyer agent: молчавшие тоже видны */
+  const agentRows = useMemo(() => [
+    { actor: 'buyer-agent', title: 'Buyer agent', sub: 'acts for every customer on the platform', provider: null as AdminOverview['providers'][number] | null },
+    ...(overview?.providers ?? []).map((p) => ({
+      actor: `provider-agent:${p.id}`, title: `${p.id} agent`, sub: `serves ${p.name}`, provider: p,
+    })),
+  ], [overview]);
 
   const reseed = async () => {
     if (!window.confirm('Reset demo data? Tasks, deals and the journal will be wiped.')) return;
@@ -198,7 +219,7 @@ export function AdminPage({ events }: { events: EventView[] }) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <TabsList>
           <TabsTrigger value="journal"><ScrollText className="size-3.5" /> Journal</TabsTrigger>
-          <TabsTrigger value="agents"><Bot className="size-3.5" /> Agents ({now.length})</TabsTrigger>
+          <TabsTrigger value="agents"><Bot className="size-3.5" /> Agents ({agentRows.length})</TabsTrigger>
           <TabsTrigger value="customers"><Users className="size-3.5" /> Customers{overview ? ` (${overview.buyers.length})` : ''}</TabsTrigger>
           <TabsTrigger value="providers"><Store className="size-3.5" /> Providers{overview ? ` (${overview.providers.length})` : ''}</TabsTrigger>
         </TabsList>
@@ -209,28 +230,32 @@ export function AdminPage({ events }: { events: EventView[] }) {
 
       <TabsContent value="journal">
         <Card>
-          <CardHeader className="flex-col gap-2">
-            <div className="flex flex-wrap items-center gap-1.5">
+          <CardHeader className="flex-col gap-2.5">
+            <div className="flex flex-wrap items-center gap-2">
               {JOURNAL_CATS.map((c) => (
-                <button key={c.key} type="button" onClick={() => setCat(c.key)}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors
-                    ${cat === c.key ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent'}`}>
-                  <c.icon className="size-3.5" /> {c.label}
+                <button key={c.key} type="button" onClick={() => setCat(c.key)} className={chipCls(cat === c.key)}>
+                  <c.icon className="size-4" /> {c.label}
                 </button>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <select value={actor} onChange={(e) => setActor(e.target.value)}
-                className="h-8 rounded-md border bg-card px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
-                <option value="">everyone</option>
-                {actors.map((a) => <option key={a} value={a}>{actorLabel(a)}</option>)}
-              </select>
-              <label className="flex cursor-pointer items-center gap-1.5 text-xs">
-                <input type="checkbox" className="accent-primary" checked={grouped}
-                  onChange={(e) => setGrouped(e.target.checked)} />
-                group by task
-              </label>
-              <span className="ml-auto text-xs text-muted-foreground">{filtered.length} of {events.length} events</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <button type="button" onClick={() => setActor('')} className={chipCls(actor === '')}>Everyone</button>
+              {actors.map((a) => (
+                <button key={a} type="button" onClick={() => setActor(actor === a ? '' : a)} className={chipCls(actor === a)}>
+                  {actorLabel(a)}
+                </button>
+              ))}
+              <div className="ml-auto flex items-center overflow-hidden rounded-full border">
+                <button type="button" onClick={() => setGrouped(true)}
+                  className={`h-9 px-4 text-[13px] font-medium ${grouped ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}`}>
+                  By task
+                </button>
+                <button type="button" onClick={() => setGrouped(false)}
+                  className={`h-9 px-4 text-[13px] font-medium ${!grouped ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}`}>
+                  Flat
+                </button>
+              </div>
+              <span className="text-xs text-muted-foreground">{filtered.length} of {events.length}</span>
             </div>
           </CardHeader>
           <CardContent>
@@ -247,34 +272,43 @@ export function AdminPage({ events }: { events: EventView[] }) {
         <Card>
           <CardHeader>
             <CardTitle>Agents</CardTitle>
-            <CardDescription>Green = working on a task right now; grey = idle, showing its last action.</CardDescription>
+            <CardDescription>One per provider plus the buyer agent. Green = working right now; grey = idle with its last action.</CardDescription>
           </CardHeader>
-          <CardContent>
-            {!now.length && <div className="py-4 text-center text-sm text-muted-foreground">Agents are quiet — the journal is empty.</div>}
-            <div className="grid gap-2 sm:grid-cols-2">
-              {now.map((e) => {
-                /* агент «в работе», пока его задача не терминальна и событие свежее */
-                const t = e.taskId ? taskMap.get(e.taskId) : undefined;
-                const working = (!t || (t.status !== 'DONE' && t.status !== 'FAILED'))
-                  && Date.now() - new Date(e.ts).getTime() < 30_000;
-                return (
-                  <div key={e.actor} className={`rounded-lg border p-3 ${working ? '' : 'opacity-70'}`}>
-                    <div className="flex items-center gap-1.5 text-xs font-semibold">
-                      <span className={`size-2 rounded-full ${working ? 'animate-pulse bg-success' : 'bg-muted-foreground/40'}`} />
-                      {actorLabel(e.actor)}
-                      {!working && <span className="font-normal text-muted-foreground">idle</span>}
+          <CardContent className="grid gap-2 lg:grid-cols-2">
+            {agentRows.map((a) => {
+              const e = lastByActor.get(a.actor);
+              const t = e?.taskId ? taskMap.get(e.taskId) : undefined;
+              const working = Boolean(e) && (!t || (t.status !== 'DONE' && t.status !== 'FAILED'))
+                && Date.now() - new Date(e!.ts).getTime() < 30_000;
+              return (
+                <div key={a.actor} className={`rounded-xl border p-3 ${working ? 'border-success/50' : ''}`}>
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <span className={`size-2 rounded-full ${working ? 'animate-pulse bg-success' : 'bg-muted-foreground/40'}`} />
+                    <Bot className="size-4 text-primary" /> {actorLabel(a.actor)}
+                    {!working && <span className="text-xs font-normal text-muted-foreground">idle</span>}
+                  </div>
+                  <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                    {a.provider ? <Store className="size-3.5" /> : <Users className="size-3.5" />}
+                    {a.sub}
+                    {a.provider && <Badge variant={a.provider.rating >= 4 ? 'success' : 'warning'}>★ {a.provider.rating.toFixed(2)}</Badge>}
+                  </div>
+                  {a.provider && (
+                    <div className="mt-0.5 text-[11px] text-muted-foreground">
+                      {a.provider.categories.join(', ')} · {a.provider.agentUrl}
                     </div>
-                    <div className="mt-0.5 truncate text-sm" title={summary(e)}>
-                      {working ? summary(e) : `last: ${summary(e)}`}
-                    </div>
+                  )}
+                  <div className="mt-1.5 truncate text-sm" title={e ? summary(e) : undefined}>
+                    {e ? (working ? summary(e) : `last: ${summary(e)}`) : <span className="text-muted-foreground">no activity yet</span>}
+                  </div>
+                  {e && (
                     <div className="mt-0.5 text-[11px] text-muted-foreground">
                       {fmtTs(e.ts)}
                       {e.taskId && <a className="text-primary hover:underline" href={`#/task/${e.taskId}`}> · view task →</a>}
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  )}
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
       </TabsContent>
@@ -292,11 +326,13 @@ export function AdminPage({ events }: { events: EventView[] }) {
 
       <TabsContent value="providers">
         <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Store className="size-4 text-primary" /> Providers</CardTitle></CardHeader>
-          <CardContent>
-            {overview?.providers.length
-              ? <ProvidersTable rows={overview.providers} />
-              : <div className="py-8 text-center text-sm text-muted-foreground">No providers yet.</div>}
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Store className="size-4 text-primary" /> Providers</CardTitle>
+            <CardDescription>Stats per store; expand one to see the catalog its agent serves to the platform, live.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            {(overview?.providers ?? []).map((p) => <ProviderBlock key={p.id} p={p} />)}
+            {!overview?.providers.length && <div className="py-8 text-center text-sm text-muted-foreground">No providers yet.</div>}
           </CardContent>
         </Card>
       </TabsContent>

@@ -89,6 +89,10 @@ export interface ProviderDealRow {
   updatedAt: string;
 }
 
+export interface CatalogItem {
+  sku: string; title: string; description?: string; unit: string; price: number; category?: string;
+}
+
 export interface AdminBuyerRow {
   id: string; name: string; email: string;
   balance: number; held: number;

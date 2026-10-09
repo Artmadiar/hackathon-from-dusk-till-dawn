@@ -1,6 +1,6 @@
-import { CheckCircle2, ChevronDown, Loader2, Package, Radio, Store, Users } from 'lucide-react';
+import { BookOpen, CheckCircle2, ChevronDown, Loader2, Package, Radio, Store } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { api, fmtTs, usd, type EventView, type ProviderDealRow, type ProviderView, type WalletView } from '../api';
+import { api, fmtTs, usd, type CatalogItem, type EventView, type ProviderDealRow, type ProviderView, type WalletView } from '../api';
 import { EventRow, GroupedEventFeed, slug } from '../components/EventFeed';
 import { useSession } from '../session';
 import { DEAL_BADGE, DEAL_LABEL } from './Task';
@@ -65,6 +65,7 @@ export function ProviderPage({ events }: { events: EventView[] }) {
   const [wallet, setWallet] = useState<WalletView | null>(null);
   const [providers, setProviders] = useState<ProviderView[]>([]);
   const [deals, setDeals] = useState<ProviderDealRow[]>([]);
+  const [catalog, setCatalog] = useState<CatalogItem[] | null>(null);
 
   const domainCount = events.filter((e) => e.kind === 'domain').length;
   useEffect(() => {
@@ -74,6 +75,11 @@ export function ProviderPage({ events }: { events: EventView[] }) {
   }, [domainCount]);
 
   const me = providers.find((p) => p.id === active?.providerId);
+  useEffect(() => {
+    if (!active?.providerId) return;
+    void api<{ items: CatalogItem[] }>('GET', `/providers/${active.providerId}/catalog`)
+      .then((r) => setCatalog(r.items)).catch(() => setCatalog([]));
+  }, [active?.providerId]);
   const won = deals.filter((d) => WON.has(d.status)).length;
   const lost = deals.filter((d) => LOST.has(d.status)).length;
   const pending = deals.length - won - lost;
@@ -120,21 +126,24 @@ export function ProviderPage({ events }: { events: EventView[] }) {
           </Card>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Users className="size-4 text-primary" /> Provider registry</CardTitle>
-            <CardDescription>Everyone discoverable by buyer agents right now.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-1.5">
-            {providers.map((p) => (
-              <div key={p.id} className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
-                <Badge variant={p.active ? 'success' : 'outline'}>{p.rating.toFixed(2)}</Badge>
-                <span className="min-w-0 flex-1 truncate">{p.name}</span>
-                <span className="text-[11px] text-muted-foreground">{p.categories.join(', ')}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        {me && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><BookOpen className="size-4 text-primary" /> Your catalog</CardTitle>
+              <CardDescription>What your agent serves to the platform right now, straight from the store.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-1.5">
+              {!catalog && <p className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="size-3.5 animate-spin" /> Asking your agent…</p>}
+              {catalog?.map((it) => (
+                <div key={it.sku} className="flex items-baseline gap-2 rounded-lg border px-2.5 py-1.5 text-xs">
+                  <span className="min-w-0 flex-1 truncate font-medium" title={it.description}>{it.title}</span>
+                  {it.category && <Badge variant="secondary">{it.category}</Badge>}
+                  <span className="shrink-0 font-semibold tabular-nums">{usd(it.price)}<span className="font-normal text-muted-foreground"> / {it.unit}</span></span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <div className="flex flex-col gap-4">

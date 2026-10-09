@@ -3,7 +3,8 @@ import type { AuthService } from '../auth/service.js';
 import type { Db } from '../db/client.js';
 import { deals, providers, spendingPolicies, tasks, users, wallets } from '../db/schema.js';
 import type { EventsQuery } from '../events/query.js';
-import { requireRole } from './identity.js';
+import { eq } from 'drizzle-orm';
+import { requireRole, resolveIdentity } from './identity.js';
 
 /** Админские ручки (C34): только role=admin, иначе 403. Журнал — полный, без фильтра R8. */
 export function registerAdminRoutes(
@@ -23,6 +24,24 @@ export function registerAdminRoutes(
 
   /** Обзор площадки: заказчики (кошелёк, задачи, политика) и исполнители (заработок, сделки).
    *  Демо-масштаб — агрегируем в TS, без group by. */
+  /** Каталог провайдера живьём: платформа спрашивает его агента (GET /catalog).
+   *  Доступно админу (любой id) и провайдеру (только свой). */
+  app.get<{ Params: { id: string } }>('/providers/:id/catalog', async (req, reply) => {
+    const identity = await resolveIdentity(req, deps.auth);
+    const allowed = identity?.role === 'admin'
+      || (identity?.role === 'provider' && identity.providerId === req.params.id);
+    if (!allowed) return reply.code(identity ? 403 : 401).send({ error: 'admin_or_own_provider_required' });
+    const [row] = await deps.db.select().from(providers).where(eq(providers.id, req.params.id));
+    if (!row) return reply.code(404).send({ error: 'unknown_provider' });
+    try {
+      const res = await fetch(`${row.agentUrl.replace(/\/$/, '')}/catalog`, { signal: AbortSignal.timeout(3000) });
+      if (!res.ok) throw new Error(`http ${res.status}`);
+      return { providerId: row.id, items: await res.json() };
+    } catch (err) {
+      return reply.code(502).send({ error: 'agent_unreachable', detail: String(err) });
+    }
+  });
+
   app.get('/admin/overview', { preHandler: requireRole(deps.auth, 'admin') }, async () => {
     const [allUsers, allWallets, allTasks, allPolicies, allProviders, allDeals] = await Promise.all([
       deps.db.select().from(users),
