@@ -124,6 +124,19 @@ function EventDetail({ e }: { e: EventView }) {
     }
     case 'REJECTED_BY_POLICY':
       return typeof p.message === 'string' ? line(p.message) : null;
+    case 'TASK_FAILED': {
+      const details = p.details as Record<string, string> | null | undefined;
+      if (!details || typeof details !== 'object') return null;
+      return (
+        <div className="mt-0.5">
+          {Object.entries(details).map(([prov, r]) => {
+            const m = /^below_min_order:(\d+)$/.exec(String(r));
+            const why = m ? `below minimum order ${usd(Number(m[1]))}` : slug(String(r));
+            return line(`${prov}: ${why}`, prov);
+          })}
+        </div>
+      );
+    }
     case 'DEAL_QUOTED':
       return typeof p.deliveryEta === 'string'
         ? line(`delivery by ${new Date(p.deliveryEta).toLocaleDateString('en-GB')}`) : null;
