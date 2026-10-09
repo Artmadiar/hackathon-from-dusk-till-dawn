@@ -108,7 +108,7 @@ function fakeParse(text: string, req: LlmRequest): Record<string, unknown> | und
     const cat = category(seg);
     if (!cat) continue;
     const qty = seg.match(/(\d+)/);
-    const unit = /пач/i.test(seg) ? 'пачка' : /короб/i.test(seg) ? 'коробка' : /барел|бутыл/i.test(seg) ? 'бутыль' : 'шт';
+    const unit = /пач|pack/i.test(seg) ? 'pack' : /короб|box/i.test(seg) ? 'box' : /барел|бутыл|bottle/i.test(seg) ? 'bottle' : 'pcs';
     items.push({
       // \W без флага u режет кириллицу — чистим края только от пробелов и пунктуации
       itemQuery: seg.replace(/^[\s.,;:!?«»"']+|[\s.,;:!?«»"']+$/g, '').replace(/^закажи\s+|^купи\s+/i, '') || seg.trim(),
@@ -118,6 +118,6 @@ function fakeParse(text: string, req: LlmRequest): Record<string, unknown> | und
     });
   }
   if (!items.length) return undefined;
-  if (items.some((i) => i.quantity === 1)) assumptions.push('количество без числа — взял 1');
+  if (items.some((i) => i.quantity === 1)) assumptions.push('quantity not given — assumed 1');
   return { items, deadline: deadline.toISOString(), budgetUsd, assumptions };
 }

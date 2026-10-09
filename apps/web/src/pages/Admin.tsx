@@ -1,4 +1,4 @@
-import { RotateCcw } from 'lucide-react';
+import { Bot, Coins, Handshake, ListTodo, RotateCcw, ScrollText, Store, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { api, fmtTs, usd, type AdminOverview, type EventView, type TaskView } from '../api';
 import { EventRow, actorLabel, summary } from '../components/EventFeed';
@@ -8,21 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-function Filter({ value, onChange, label, options }: {
-  value: string; onChange: (v: string) => void; label: string; options: string[];
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="h-8 rounded-md border bg-card px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-    >
-      <option value="">{label}: all</option>
-      {options.map((o) => <option key={o} value={o}>{o}</option>)}
-    </select>
-  );
-}
 
 /** Журнал, сгруппированный по задачам: заголовок — что покупали и статус, внутри — события. */
 function GroupedJournal({ events, tasks }: { events: EventView[]; tasks: Map<string, TaskView> }) {
@@ -162,11 +147,20 @@ function ProvidersTable({ rows }: { rows: AdminOverview['providers'] }) {
   );
 }
 
-/** Admin: journal (grouped by task), customers, providers, demo reset. */
+/** Категории журнала — вместо технических kind/type: смысловые фильтры одним кликом. */
+const JOURNAL_CATS: Array<{ key: string; label: string; icon: typeof Coins; types?: string[] }> = [
+  { key: 'all', label: 'All', icon: ScrollText },
+  { key: 'money', label: 'Money', icon: Coins, types: ['DEPOSIT', 'HOLD_PLACED', 'HOLD_RELEASE', 'CAPTURE'] },
+  { key: 'deals', label: 'Deals', icon: Handshake, types: ['DEAL_QUOTED', 'DEAL_ACCEPTED', 'DEAL_SETTLED', 'DEAL_CANCELLED', 'OFFER_WITHDRAWN', 'REJECTED_BY_POLICY'] },
+  { key: 'tasks', label: 'Tasks', icon: ListTodo, types: ['TASK_CREATED', 'TASK_DONE', 'TASK_FAILED'] },
+  { key: 'stores', label: 'Stores', icon: Store, types: ['ORDER_PLACED', 'PROOF_RECEIVED', 'WEBHOOK_REJECTED', 'PROVIDER_ONBOARDED', 'RATING_CHANGED', 'IDEMPOTENT_REPLAY'] },
+  { key: 'agents', label: 'Agent internals', icon: Bot },
+];
+
+/** Admin: agents, journal, customers, providers — каждый раздел со своей смысловой нагрузкой. */
 export function AdminPage({ events }: { events: EventView[] }) {
-  const [kind, setKind] = useState('');
+  const [cat, setCat] = useState('all');
   const [actor, setActor] = useState('');
-  const [type, setType] = useState('');
   const [grouped, setGrouped] = useState(true);
   const [busy, setBusy] = useState(false);
   const [overview, setOverview] = useState<AdminOverview | null>(null);
@@ -180,10 +174,11 @@ export function AdminPage({ events }: { events: EventView[] }) {
   const taskMap = useMemo(() => new Map(taskList.map((t) => [t.id, t])), [taskList]);
 
   const actors = useMemo(() => [...new Set(events.map((e) => e.actor))].sort(), [events]);
-  const types = useMemo(() => [...new Set(events.map((e) => e.type))].sort(), [events]);
 
+  const activeCat = JOURNAL_CATS.find((c) => c.key === cat);
   const filtered = events.filter((e) =>
-    (!kind || e.kind === kind) && (!actor || e.actor === actor) && (!type || e.type === type));
+    (!actor || e.actor === actor)
+    && (cat === 'all' || (cat === 'agents' ? e.kind === 'agent' : (activeCat?.types ?? []).includes(e.type))));
 
   /* the latest agent event per actor = "what is it doing right now" (concept 3.8) */
   const now = useMemo(() => {
@@ -202,16 +197,53 @@ export function AdminPage({ events }: { events: EventView[] }) {
     <Tabs defaultValue="journal" className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <TabsList>
-          <TabsTrigger value="journal">Journal</TabsTrigger>
-          <TabsTrigger value="customers">Customers{overview ? ` (${overview.buyers.length})` : ''}</TabsTrigger>
-          <TabsTrigger value="providers">Providers{overview ? ` (${overview.providers.length})` : ''}</TabsTrigger>
+          <TabsTrigger value="journal"><ScrollText className="size-3.5" /> Journal</TabsTrigger>
+          <TabsTrigger value="agents"><Bot className="size-3.5" /> Agents ({now.length})</TabsTrigger>
+          <TabsTrigger value="customers"><Users className="size-3.5" /> Customers{overview ? ` (${overview.buyers.length})` : ''}</TabsTrigger>
+          <TabsTrigger value="providers"><Store className="size-3.5" /> Providers{overview ? ` (${overview.providers.length})` : ''}</TabsTrigger>
         </TabsList>
         <Button variant="outline" size="sm" disabled={busy} onClick={() => void reseed()}>
           <RotateCcw /> Reset demo
         </Button>
       </div>
 
-      <TabsContent value="journal" className="flex flex-col gap-4">
+      <TabsContent value="journal">
+        <Card>
+          <CardHeader className="flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {JOURNAL_CATS.map((c) => (
+                <button key={c.key} type="button" onClick={() => setCat(c.key)}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors
+                    ${cat === c.key ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent'}`}>
+                  <c.icon className="size-3.5" /> {c.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <select value={actor} onChange={(e) => setActor(e.target.value)}
+                className="h-8 rounded-md border bg-card px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
+                <option value="">everyone</option>
+                {actors.map((a) => <option key={a} value={a}>{actorLabel(a)}</option>)}
+              </select>
+              <label className="flex cursor-pointer items-center gap-1.5 text-xs">
+                <input type="checkbox" className="accent-primary" checked={grouped}
+                  onChange={(e) => setGrouped(e.target.checked)} />
+                group by task
+              </label>
+              <span className="ml-auto text-xs text-muted-foreground">{filtered.length} of {events.length} events</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {grouped
+              ? <GroupedJournal events={filtered} tasks={taskMap} />
+              : <div className="flex max-h-[65vh] flex-col gap-1.5 overflow-y-auto pr-1">
+                  {[...filtered].reverse().map((e) => <EventRow key={e.id} e={e} showTask raw />)}
+                </div>}
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="agents">
         <Card>
           <CardHeader>
             <CardTitle>Agents</CardTitle>
@@ -219,7 +251,7 @@ export function AdminPage({ events }: { events: EventView[] }) {
           </CardHeader>
           <CardContent>
             {!now.length && <div className="py-4 text-center text-sm text-muted-foreground">Agents are quiet — the journal is empty.</div>}
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-2 sm:grid-cols-2">
               {now.map((e) => {
                 /* агент «в работе», пока его задача не терминальна и событие свежее */
                 const t = e.taskId ? taskMap.get(e.taskId) : undefined;
@@ -245,32 +277,11 @@ export function AdminPage({ events }: { events: EventView[] }) {
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex-row flex-wrap items-center gap-2">
-            <Filter value={kind} onChange={setKind} label="kind" options={['domain', 'agent']} />
-            <Filter value={actor} onChange={setActor} label="actor" options={actors} />
-            <Filter value={type} onChange={setType} label="type" options={types} />
-            <label className="flex cursor-pointer items-center gap-1.5 text-xs">
-              <input type="checkbox" className="accent-primary" checked={grouped}
-                onChange={(e) => setGrouped(e.target.checked)} />
-              group by task
-            </label>
-            <span className="ml-auto text-xs text-muted-foreground">{filtered.length} of {events.length}</span>
-          </CardHeader>
-          <CardContent>
-            {grouped
-              ? <GroupedJournal events={filtered} tasks={taskMap} />
-              : <div className="flex max-h-[65vh] flex-col gap-1.5 overflow-y-auto pr-1">
-                  {[...filtered].reverse().map((e) => <EventRow key={e.id} e={e} showTask raw />)}
-                </div>}
-          </CardContent>
-        </Card>
       </TabsContent>
 
       <TabsContent value="customers">
         <Card>
-          <CardHeader><CardTitle>Customers</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="flex items-center gap-2"><Users className="size-4 text-primary" /> Customers</CardTitle></CardHeader>
           <CardContent>
             {overview?.buyers.length
               ? <BuyersTable rows={overview.buyers} />
@@ -281,7 +292,7 @@ export function AdminPage({ events }: { events: EventView[] }) {
 
       <TabsContent value="providers">
         <Card>
-          <CardHeader><CardTitle>Providers</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="flex items-center gap-2"><Store className="size-4 text-primary" /> Providers</CardTitle></CardHeader>
           <CardContent>
             {overview?.providers.length
               ? <ProvidersTable rows={overview.providers} />
