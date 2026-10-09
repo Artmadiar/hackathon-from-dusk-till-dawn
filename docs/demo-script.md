@@ -39,32 +39,16 @@
 
 Запись голоса: тихо, телефон близко, пауза 1–2 сек между блоками; сбился — повтори блок, лишнее вырежется.
 
-## Питч, 60 секунд (без лайв-демо)
+## Питч, 60 секунд — ФИНАЛ (три слайда: docs/pitch-slides.html, стрелки/клик, фуллскрин)
 
-Экран: один заранее открытый кадр — Task page завершённой сделки (степпер DONE, офферы
-четырёх магазинов, SETTLED). Вкладки не переключаем, курсором не водим: всё время — на речь.
+| Сек | Слайд | Текст (EN) |
+|---|---|---|
+| 0–10 | 1 · «Your agent can choose. It can't pay.» | "Ask an AI agent to buy something. It finds the product, compares prices — and then it stops. A human pulls out the card. Agents can choose — they can't pay." |
+| 10–30 | 2 · Карта: You → Elf → Platform → Store agents → Stores | "We built Shop Elf: a marketplace where your agent buys from store agents — with real money. You top up a wallet and say what you need. Your elf compares offers and completes the deal. Stores plug in with a public API and one webhook." |
+| 30–45 | 3 · «Agents propose. The platform decides.» | "What makes it safe: agents propose, the platform decides. Money moves only through code — escrow hold, double-entry ledger, automatic failover if a store drops out. The LLM never touches a cent." |
+| 45–60 | 3 (остаёмся) | "Built overnight, running live: real Stripe checkout, four stores, settled deals — it's all in our video. You set the budget. Your elf does the buying. Shop Elf." |
 
-Текст (EN, ~140 слов, обычный темп):
-
-> **0–8 · Hook.** "Every AI-agent demo ends the same way: the agent decides — and a human
-> pulls out a credit card. The agentic economy stops at checkout."
->
-> **8–25 · Что это (месседж 1).** "Shop Elf is a marketplace where agents buy
-> from agents with real money. You top up a wallet once, set a spending policy — and your
-> agent discovers stores, compares offers and pays on its own, within your limits."
->
-> **25–42 · Почему безопасно (месседж 2).** "What makes it safe: agents propose, the
-> platform decides. Money only moves through deterministic code — escrow holds, a
-> double-entry ledger, automatic failover to the next store when one drops out. The LLM
-> never touches a cent."
->
-> **42–60 · Доказательство + закрытие.** "Built overnight and running end-to-end: a real
-> Stripe top-up, four independent stores with their own back offices, settled deals and
-> handled failures — it's all in our 90-second video. One top-up. Policy-bounded autonomous
-> buying. Shop Elf."
-
-Запасной план: среда остаётся поднятой (раскладка вкладок ниже) — если жюри задаст вопрос
-или останутся секунды, показываем живой Task page, но питч на это не рассчитывает.
+~145 слов. Репетировать вслух с таймером; переключение слайдов: → / пробел / клик.
 
 ## Что честно говорим про ограничения (критерий 5, 10%)
 

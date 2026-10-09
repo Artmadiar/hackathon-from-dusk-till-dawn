@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Elf — Pitch</title>
+<style>
+  :root {
+    --bg: #0e1016; --card: #161a24; --border: #2a2f40; --fg: #eef0f6; --muted: #8e93a6;
+    --indigo: #6366f1; --indigo-soft: #a5b4fc; --amber: #f0a832; --green: #34c384; --red: #e5636b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--fg); overflow: hidden; cursor: default;
+    font-family: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .slide {
+    position: absolute; inset: 0; display: none; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; padding: 5vh 6vw;
+    background:
+      radial-gradient(60% 50% at 50% -10%, rgba(99,102,241,.16), transparent 70%),
+      var(--bg);
+  }
+  .slide.active { display: flex; }
+  .dots { position: fixed; bottom: 3vh; left: 50%; transform: translateX(-50%); display: flex; gap: 1.2vh; }
+  .dots i { width: 1.2vh; height: 1.2vh; border-radius: 50%; background: var(--border); }
+  .dots i.on { background: var(--indigo-soft); }
+
+  /* slide 1 — hook */
+  .hook-elf { font-size: 11vh; margin-bottom: 4vh; }
+  .hook h1 { font-size: 9vh; font-weight: 760; line-height: 1.15; letter-spacing: .005em; }
+  .hook h1 .no { color: var(--red); }
+
+  /* slide 2 — map */
+  .map h1 { font-size: 5.6vh; font-weight: 740; margin-bottom: 1.6vh; }
+  .map .sub { font-size: 3vh; color: var(--muted); margin-bottom: 7vh; }
+  .map .sub b { color: var(--fg); }
+  .row { display: flex; align-items: stretch; gap: 1.6vw; justify-content: center; width: 100%; }
+  .node {
+    background: var(--card); border: 1px solid var(--border); border-radius: 2.2vh;
+    padding: 3.4vh 1.6vw; min-width: 13vw; display: flex; flex-direction: column; gap: 1.2vh;
+    align-items: center; justify-content: center;
+  }
+  .node .ico { font-size: 6vh; }
+  .node .t { font-size: 3vh; font-weight: 680; white-space: nowrap; }
+  .node .d { font-size: 2.1vh; color: var(--muted); line-height: 1.35; }
+  .node.hero {
+    border-color: color-mix(in srgb, var(--indigo) 60%, var(--border));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--indigo) 15%, var(--card)), var(--card));
+    box-shadow: 0 0 7vh rgba(99,102,241,.25);
+  }
+  .arr { align-self: center; font-size: 4.5vh; color: var(--indigo-soft); }
+
+  /* slide 3 — trust */
+  .trust h1 { font-size: 7vh; font-weight: 750; line-height: 1.2; margin-bottom: 1.2vh; }
+  .trust h1 .a { color: var(--amber); }
+  .trust h1 .b { color: var(--indigo-soft); }
+  .trust .sub { font-size: 3.1vh; color: var(--muted); margin-bottom: 6.5vh; }
+  .flow { display: flex; align-items: center; gap: 1.2vw; margin-bottom: 5.5vh; }
+  .pill {
+    font-size: 3vh; font-weight: 720; letter-spacing: .06em; padding: 1.6vh 1.8vw;
+    border-radius: 99px; border: 2px solid var(--border);
+  }
+  .pill.money { color: var(--green); border-color: color-mix(in srgb, var(--green) 60%, transparent); }
+  .pill.fill { background: color-mix(in srgb, var(--green) 16%, transparent); }
+  .flow .sep { color: var(--muted); font-size: 3.4vh; }
+  .facts { font-size: 2.8vh; color: var(--muted); line-height: 1.7; }
+  .facts b { color: var(--fg); font-weight: 640; }
+  .facts .x { color: var(--red); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<section class="slide hook active">
+  <div class="hook-elf">🧝</div>
+  <h1>Your agent can choose.<br><span class="no">It can&rsquo;t pay.</span></h1>
+</section>
+
+<section class="slide map">
+  <h1>Shop Elf<span style="color:var(--indigo-soft)">.</span></h1>
+  <div class="sub"><b>A marketplace where agents buy from agents</b> — with real money.</div>
+  <div class="row">
+    <div class="node"><div class="ico">👤</div><div class="t">You</div><div class="d">fund the wallet,<br>say what you need</div></div>
+    <div class="arr">→</div>
+    <div class="node"><div class="ico">🧝</div><div class="t">Your Elf</div><div class="d">finds stores,<br>compares, buys</div></div>
+    <div class="arr">→</div>
+    <div class="node hero"><div class="ico">🏛️</div><div class="t">Platform</div><div class="d">wallet · escrow<br>· ledger</div></div>
+    <div class="arr">→</div>
+    <div class="node"><div class="ico">🤖</div><div class="t">Store agents</div><div class="d">quote, fulfil,<br>prove delivery</div></div>
+    <div class="arr">→</div>
+    <div class="node"><div class="ico">🏪</div><div class="t">Stores</div><div class="d">plug in: public API<br>+ one webhook</div></div>
+  </div>
+</section>
+
+<section class="slide trust">
+  <h1><span class="a">Agents propose.</span> <span class="b">The platform decides.</span></h1>
+  <div class="sub">Money moves only through deterministic code — the LLM never touches a cent.</div>
+  <div class="flow">
+    <span class="pill">QUOTES</span><span class="sep">→</span>
+    <span class="pill money">HOLD</span><span class="sep">→</span>
+    <span class="pill">ORDER</span><span class="sep">→</span>
+    <span class="pill">PROOF</span><span class="sep">→</span>
+    <span class="pill money fill">CAPTURE</span>
+  </div>
+  <div class="facts">
+    Store <span class="x">fails</span> → money auto-releases, the elf re-orders from the next one.<br>
+    <b>Built overnight · ran live end-to-end · real Stripe (test mode) · 4 stores</b>
+  </div>
+</section>
+
+<div class="dots"><i class="on"></i><i></i><i></i></div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const dots = [...document.querySelectorAll('.dots i')];
+  let cur = Math.min(Math.max((parseInt(location.hash.slice(1)) || 1) - 1, 0), slides.length - 1);
+  function show(i) {
+    cur = Math.min(Math.max(i, 0), slides.length - 1);
+    slides.forEach((s, k) => s.classList.toggle('active', k === cur));
+    dots.forEach((d, k) => d.classList.toggle('on', k === cur));
+  }
+  show(cur);
+  addEventListener('keydown', (e) => {
+    if (['ArrowRight', ' ', 'PageDown', 'Enter'].includes(e.key)) show(cur + 1);
+    if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) show(cur - 1);
+  });
+  addEventListener('click', () => show(cur + 1));
+</script>
+</body>
+</html>
