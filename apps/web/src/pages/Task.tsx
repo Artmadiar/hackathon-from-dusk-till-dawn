@@ -31,8 +31,9 @@ const STEPS: Array<{ label: string; at: Array<TaskView['status']> }> = [
 ];
 
 /** Горизонтальный степпер: за 2 секунды видно, где находится задача (видео 90s). */
-function TaskStepper({ status }: { status: TaskView['status'] }) {
+function TaskStepper({ status, failedAt }: { status: TaskView['status']; failedAt?: number }) {
   const current = status === 'DONE' ? STEPS.length
+    : status === 'FAILED' ? (failedAt ?? 1)
     : Math.max(0, STEPS.findIndex((s) => s.at.includes(status)));
   const failed = status === 'FAILED';
   return (
@@ -110,10 +111,10 @@ export function TaskPage({ taskId }: { taskId: string }) {
             Budget {usd(task.request.budget.max)}{task.request.budget.source === 'estimated' && ' (agent estimate)'}
             {' · '}deadline {fmtDate(task.request.deadline)}
             {' · '}deliver to {task.request.deliveryAddress}
-            {task.failReason && <span className="text-destructive"> · reason: {task.failReason}</span>}
+            {task.failReason && <span className="text-destructive"> · reason: {slug(task.failReason)}</span>}
           </div>
         </CardHeader>
-        <CardContent className="pt-0"><TaskStepper status={task.status} /></CardContent>
+        <CardContent className="pt-0"><TaskStepper status={task.status} failedAt={deals.length ? 2 : 1} /></CardContent>
       </Card>
 
       <div className="grid items-start gap-4 lg:grid-cols-[400px_1fr]">

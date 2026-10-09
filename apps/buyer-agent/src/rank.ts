@@ -29,6 +29,9 @@ export interface ExcludedQuote {
   dealId: string;
   reason: string;
   violations?: Violation[];
+  /** На каких числах принято решение — чтобы UI мог объяснить отсев. */
+  total?: number;
+  limit?: number;
 }
 
 export interface RankResult {
@@ -51,13 +54,14 @@ export function rankQuotes(opts: {
     const violations = validateQuote(req, c.quote, now);
     const errors = violations.filter((v) => v.severity === 'error');
     if (errors.length > 0) {
-      excluded.push({ providerId: c.providerId, dealId: c.dealId,
+      excluded.push({ providerId: c.providerId, dealId: c.dealId, total: c.quote.total,
         reason: errors.map((v) => v.code).join(','), violations: errors });
       continue;
     }
     const soft = req.budget.source === 'estimated';
     if (soft && c.quote.total > req.budget.max * 2) {
-      excluded.push({ providerId: c.providerId, dealId: c.dealId, reason: 'price_anomaly' });
+      excluded.push({ providerId: c.providerId, dealId: c.dealId, reason: 'price_anomaly',
+        total: c.quote.total, limit: req.budget.max * 2 });
       continue;
     }
     eligible.push({ ...c, aboveEstimate: soft && c.quote.total > req.budget.max });

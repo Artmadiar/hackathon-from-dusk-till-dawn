@@ -21,7 +21,7 @@ describe('C14/C16: ранжирование', () => {
     const decision = platform.events.find((e) => e.type === 'DECISION'
       && (e.payload as { step: string }).step === 'evaluate_quotes');
     expect((decision?.payload as { excluded: unknown }).excluded)
-      .toEqual([{ providerId: 'levny', reason: 'eta_after_deadline' }]);
+      .toEqual([{ providerId: 'levny', reason: 'eta_after_deadline', total: 3500, limit: undefined }]);
     expect(platform.failures).toEqual([]);
   });
 
@@ -83,7 +83,7 @@ describe('C35/R2: бюджет', () => {
       excluded: Array<{ providerId: string; reason: string }>;
       scoreTable: Array<{ providerId: string; aboveEstimate: boolean; score: number }>;
     };
-    expect(payload.excluded).toEqual([{ providerId: 'kancelar', reason: 'price_anomaly' }]);
+    expect(payload.excluded).toEqual([{ providerId: 'kancelar', reason: 'price_anomaly', total: 9000, limit: 8000 }]);
     expect(payload.scoreTable).toEqual([
       // 4.9×0.5 + 0.9×0.3 + 1×0.2 − 0.2 = 2.72
       expect.objectContaining({ providerId: 'papirna', aboveEstimate: true, score: 2.72 }),

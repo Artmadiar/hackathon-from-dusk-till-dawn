@@ -105,7 +105,13 @@ function EventDetail({ e }: { e: EventView }) {
                 </tr>
               ))}</tbody>
             </table>
-            {excluded.map((x, i) => line(`excluded ${String(x.providerId)}: ${slug(String(x.reason ?? ''))}`, `x${i}`))}
+            {excluded.map((x, i) => {
+              const base = `excluded ${String(x.providerId)}: ${slug(String(x.reason ?? ''))}`;
+              const why = x.reason === 'price_anomaly' && typeof x.total === 'number' && typeof x.limit === 'number'
+                ? ` — quote ${usd(x.total)} is over the sanity cap ${usd(x.limit)} (2× the estimated budget)`
+                : typeof x.total === 'number' ? ` (quote ${usd(x.total)})` : '';
+              return line(base + why, `x${i}`);
+            })}
           </div>
         );
       }

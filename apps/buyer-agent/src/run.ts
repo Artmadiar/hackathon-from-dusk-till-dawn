@@ -145,7 +145,8 @@ export class BuyerRunner {
         providerId: r.providerId, score: r.score, rating: r.rating, match: r.match,
         priceAdvantage: r.priceAdvantage, preferred: r.preferred, aboveEstimate: r.aboveEstimate, total: r.quote.total,
       })),
-      excluded: excluded.map((e) => ({ providerId: e.providerId, reason: e.reason })),
+      budget: req.budget,
+      excluded: excluded.map((e) => ({ providerId: e.providerId, reason: e.reason, total: e.total, limit: e.limit })),
     });
 
     if (ranked.length === 0) {
