@@ -52,6 +52,13 @@ export function summary(e: EventView): string {
   }
 }
 
+/* Акторы наружу — по-человечески: provider-agent:papirna -> "papirna agent" */
+export function actorLabel(actor: string): string {
+  if (actor === 'buyer-agent') return 'buyer agent';
+  if (actor.startsWith('provider-agent:')) return `${actor.slice('provider-agent:'.length)} agent`;
+  return actor;
+}
+
 function Until({ until }: { until: string }) {
   const left = Math.max(0, Math.round((new Date(until).getTime() - Date.now()) / 1000));
   return <Badge variant="default">⏳ {left}s</Badge>;
@@ -63,12 +70,12 @@ export function EventRow({ e, showTask }: { e: EventView; showTask?: boolean }) 
     <div className={`rounded-lg border px-3 py-2 text-sm ${e.kind === 'agent' ? 'bg-muted/30' : 'bg-card'}`}>
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
         <span className="text-[11px] tabular-nums text-muted-foreground">{fmtTs(e.ts)}</span>
-        <span className="max-w-[160px] truncate text-xs text-muted-foreground" title={e.actor}>{e.actor}</span>
+        <span className="max-w-[160px] truncate text-xs text-muted-foreground" title={e.actor}>{actorLabel(e.actor)}</span>
         <Badge variant={EVENT_BADGE[e.type] ?? 'outline'}>{e.type}</Badge>
         <span className="min-w-0 flex-1 truncate" title={summary(e)}>{summary(e)}</span>
         {e.type === 'WAITING' && typeof p.until === 'string' && <Until until={p.until} />}
         {showTask && e.taskId && (
-          <a className="text-xs text-primary hover:underline" href={`#/task/${e.taskId}`}>{shortId(e.taskId)}</a>
+          <a className="text-xs text-primary hover:underline" href={`#/task/${e.taskId}`}>view task →</a>
         )}
       </div>
       {Object.keys(p).length > 0 && (

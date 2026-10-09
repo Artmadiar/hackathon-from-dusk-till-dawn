@@ -131,7 +131,7 @@ function inventoryTable(ctx: StoreContext, products: ProductRow[]): string {
   const rows = products.map((p) => `
     <tr>
       <td style="font-size:20px">${esc(p.emoji ?? '📦')}</td>
-      <td><b>${esc(p.title)}</b><br><span class="mono">${esc(p.sku)}</span></td>
+      <td><b>${esc(p.title)}</b><br><span class="sub">${esc(p.description ?? '')}</span><br><span class="mono">${esc(p.sku)}</span></td>
       <td class="sub">${esc(p.category ?? '—')}</td>
       <td class="num">${money(p.price)}<span class="sub"> / ${esc(p.unit)}</span></td>
       <td class="num"><b>${p.stock}</b>${lag ? `<br><span class="sub">public: ${p.snapshot_stock}</span>` : ''}</td>
