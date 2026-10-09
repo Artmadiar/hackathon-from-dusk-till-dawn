@@ -45,7 +45,7 @@
 |---|---|---|
 | 0–13 | 1 · «Your agent can choose. It can't pay.» | "Ask an AI agent to buy paper for your office. It will find it, compare prices — and stop. At the checkout, a human still pays. Agents can choose — they can't pay." |
 | 13–28 | 2 · Shop Elf: Put money in → Say what you need → Agents close the deal | "Shop Elf fixes that — a marketplace with agents on both sides: your elf buys, store agents sell. You put money in, set a limit, and write: 'order five packs of paper by Thursday.' The agents work out the deal between themselves — offers, details, delivery." |
-| 28–44 | 3 · «Neither agent holds the money»: LOCKED → DELIVERED → PAID | "And the money? Neither agent ever holds it — the platform does. It pays the store only after delivery. If a store fails, the money comes back, and the elf buys from the next one. The limit lives in code — no way to overspend." |
+| 28–44 | 3 · «Neither agent holds the money»: LOCKED → CONFIRMED → PAID | "And the money? Neither agent ever holds it — the platform does. It pays the store only when the deal is confirmed. If a store fails, the money comes back, and the elf buys from the next one. The limit lives in code — no way to overspend." |
 | 44–60 | 4 · «Built in one night» + закрытие | "We built this in one night, and it works end to end — a real Stripe payment, four stores, finished deals. It's all in our video. You set the budget. Your elf does the shopping. Shop Elf." |
 
 ~150 слов, без жаргона; «limit lives in code» и «money comes back» — это ответы на чек-лист жюри
