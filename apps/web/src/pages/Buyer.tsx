@@ -54,23 +54,31 @@ export function BuyerPage({ events }: { events: EventView[] }) {
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="size-4 text-primary" /> New task
             </CardTitle>
-            <CardDescription>Tell your agent what to buy — it fills in the structure, you confirm.</CardDescription>
+            <CardDescription>Describe what you need. The agent drafts a structured request; nothing starts until you confirm.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             <Textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} />
             <div className="flex gap-2">
-              <Button disabled={busy || !text.trim()} onClick={() => void parse()}>
-                {busy && !preview ? <Loader2 className="animate-spin" /> : <Sparkles />} Fill from text
+              <Button variant={preview ? 'secondary' : 'default'} disabled={busy || !text.trim()} onClick={() => void parse()}>
+                {busy && !preview ? <Loader2 className="animate-spin" /> : <Sparkles />}
+                {busy && !preview ? 'Agent is reading…' : preview ? 'Re-draft' : 'Draft the task'}
               </Button>
               {preview && (
-                <Button variant="secondary" disabled={busy} onClick={() => void create()}>
-                  {busy ? <Loader2 className="animate-spin" /> : null} Create task
-                </Button>
+                <>
+                  <Button disabled={busy} onClick={() => void create()}>
+                    {busy ? <Loader2 className="animate-spin" /> : null} Looks right — start the agent
+                  </Button>
+                  <Button variant="ghost" disabled={busy} onClick={() => setPreview(null)}>Discard</Button>
+                </>
               )}
             </div>
             {err && <p className="text-xs text-destructive">{err}</p>}
             {preview && (
               <div className="flex flex-col gap-2 border-t pt-3">
+                <p className="text-xs font-medium">
+                  <Badge variant="warning">DRAFT</Badge> This is what the agent understood — it has not
+                  started yet. Confirm below or edit the text and re-draft.
+                </p>
                 <Table>
                   <TableHeader>
                     <TableRow>
