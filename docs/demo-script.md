@@ -24,6 +24,10 @@
 
 ## Видео, 90 секунд (раскадровка)
 
+Структура с формы сабмишна (hq.agents007.ai/submit, «Show it working, not slides»):
+15с проблема → 60с живое демо полного сценария → 15с «что реально / что симулировано / что дальше».
+Наши слайд-кадры укладываются в первые и последние 15 секунд; середина — только живой продукт.
+
 | Время | Экран | Текст за кадром (EN) |
 |---|---|---|
 | 0–10 | **Слайд-схема** (`docs/video-slide.html` фуллскрин): Buyers ↔ Platform ↔ Providers, агенты с двух сторон, флоу REQUEST→CAPTURE | "AI agents can decide — but when it's time to pay, a human still pulls out a card. We built a marketplace where agents buy from agents with real money, safely. Here's the map — now watch it run." |
@@ -31,8 +35,8 @@
 | 22–38 | Buyer home: ввод текста → Fill from text → структура → Create | "You just say what you need. The agent turns free text into a structured request — budget, deadline, categories." |
 | 38–52 | Task page: степпер бежит, карточки офферов 4 магазинов с именами и ценами | "The platform discovers four independent stores; their agents quote in seconds. The buyer agent compares price, delivery and rating." |
 | 52–66 | Момент решения: HELD → ORDER_PLACED; переключение на Back office магазина — заказ прилетел, invoice | "The platform — deterministic code, not the LLM — holds the funds and places the order. Here's the store's own back office: the order just arrived in *their* system." |
-| 66–78 | Proof → SETTLED; степпер DONE; Admin: hold → capture в леджере | "Delivery proof comes back, the hold is captured to the store's wallet. Every cent is double-entry ledger, every event logged." |
-| 78–90 | Failure-кейс 3 сек (offer withdrawn → агент к следующему) → финальный кадр: снова слайд-схема | "If a store fails, funds release automatically and the agent re-orders elsewhere. Humans top up; agents do the buying. Agentic Procurement." |
+| 66–78 | Proof → SETTLED; Admin: hold → capture; failure-флеш 3 сек (offer withdrawn → агент к следующему) | "Delivery proof comes back, the hold is captured to the store's wallet — double-entry ledger, every event logged. And if a store fails, funds release and the agent re-orders elsewhere." |
+| 78–90 | Финальный кадр: снова слайд-схема | "Everything you saw ran live. Stripe is test mode — labeled SIMULATED; settlement is our own double-entry ledger; the four stores are demo instances wired as external businesses. Next: a new domain is just a new contract type. Agentic Procurement." |
 
 Приёмы: курсор не ищет — всё в закладках; монтаж жмёт паузы; на 38–66 можно x1.5.
 
