@@ -63,18 +63,36 @@
 
   .close-line { font-size: 5vh; font-weight: 700; line-height: 1.4; margin-top: 5vh; }
   .close-line .elf { font-size: 5.5vh; }
+
+  .notes {
+    position: absolute; top: 3.5vh; left: 50%; transform: translateX(-50%);
+    width: 78vw; font-size: 2.5vh; line-height: 1.55; color: #c6cadb;
+    background: color-mix(in srgb, var(--card) 80%, transparent);
+    border: 1px solid var(--border); border-radius: 1.6vh; padding: 1.8vh 1.6vw;
+    text-align: left; font-style: italic;
+  }
+  body.notes-hidden .notes { display: none; }
+  #notes-toggle {
+    position: fixed; top: 2.4vh; right: 1.4vw; z-index: 10;
+    width: 4.4vh; height: 4.4vh; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--card); color: var(--muted);
+    font-size: 2vh; cursor: pointer; opacity: .35; transition: opacity .15s;
+  }
+  #notes-toggle:hover { opacity: 1; }
 </style>
 </head>
 <body>
 
 <!-- 1 · hook -->
 <section class="slide active">
+  <div class="notes">Ask an AI agent to buy paper for your office. It will find it, compare prices — and stop. At the checkout, a human still pays. Agents can choose — they can’t pay.</div>
   <div class="hook-elf">🧝</div>
   <h1 class="big">Your agent can choose.<br><span class="no">It can&rsquo;t pay.</span></h1>
 </section>
 
 <!-- 2 · product -->
 <section class="slide">
+  <div class="notes">Shop Elf fixes that — a marketplace with agents on both sides: your elf buys, store agents sell. You put money in, set a limit, and write: “order five packs of paper by Thursday.” The agents work out the deal between themselves — offers, details, delivery.</div>
   <div class="brand">Shop Elf<span>.</span></div>
   <div class="sub">Agents on both sides: <b style="color:var(--fg)">your elf buys, store agents sell</b>.</div>
   <div class="row">
@@ -89,6 +107,7 @@
 
 <!-- 3 · money -->
 <section class="slide">
+  <div class="notes">And the money? Neither agent ever holds it — the platform does. It pays the store only when the deal is confirmed. If a store fails, the money comes back, and the elf buys from the next one. The limit lives in code — no way to overspend.</div>
   <div class="brand">Neither agent holds the money<span>.</span></div>
   <div class="sub">The platform does — it moves the money, and pays the store only when the deal is confirmed.</div>
   <div class="flow">
@@ -104,6 +123,7 @@
 
 <!-- 4 · proof + close -->
 <section class="slide">
+  <div class="notes">We built this in one night, and it works end to end — a real Stripe payment, four stores, finished deals. It’s all in our video. You set the budget. Your elf does the shopping. Shop Elf.</div>
   <h1 class="big" style="font-size:7vh; margin-bottom:4.5vh">Built in one night.</h1>
   <div class="facts" style="font-size:3.2vh">
     Works end to end · real Stripe payment (test mode)<br>
@@ -112,6 +132,7 @@
   <div class="close-line">You set the budget.<br><span class="elf">🧝</span> Your elf does the shopping.</div>
 </section>
 
+<button id="notes-toggle" title="Show / hide speaker notes">Aa</button>
 <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
 
 <script>
@@ -129,6 +150,18 @@
     if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) show(cur - 1);
   });
   addEventListener('click', () => show(cur + 1));
+
+  const tgl = document.getElementById('notes-toggle');
+  function setNotes(hidden) {
+    document.body.classList.toggle('notes-hidden', hidden);
+    try { localStorage.setItem('notesHidden', hidden ? '1' : ''); } catch {}
+  }
+  tgl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setNotes(!document.body.classList.contains('notes-hidden'));
+  });
+  addEventListener('keydown', (e) => { if (e.key === 'n' || e.key === 't') setNotes(!document.body.classList.contains('notes-hidden')); });
+  try { if (localStorage.getItem('notesHidden')) setNotes(true); } catch {}
 </script>
 </body>
 </html>
