@@ -1,15 +1,15 @@
 {
   "id": "levny",
   "name": "Levný Papír",
-  "tagline": "Nejlevnější papír a kancelářské potřeby s pomalou ale spolehlivou doručkou.",
+  "tagline": "The cheapest paper and office supplies — slow but reliable delivery.",
   "inventoryLag": false,
   "autoConfirm": true,
   "delivery": {"type": "leadDays", "days": 7},
   "products": [
     {
       "sku": "LEV-A4-500",
-      "title": "Kancelářský papír A4 500 listů",
-      "description": "Bílý papír A4 80 g/m² za nejnižší cenu na trhu.",
+      "title": "Office paper A4, 500 sheets",
+      "description": "White A4 paper 80 g/m² at the lowest price on the market.",
       "unit": "pack",
       "price": 450,
       "category": "paper",
@@ -18,8 +18,8 @@
     },
     {
       "sku": "LEV-ENVELOPES",
-      "title": "Obálky C6 bílé",
-      "description": "Ekonomické balení 50 kusů bílých obálek se samolepicím pruhem.",
+      "title": "White C6 envelopes",
+      "description": "Economy pack of 50 white self-seal envelopes.",
       "unit": "pack",
       "price": 210,
       "category": "paper",
@@ -28,8 +28,8 @@
     },
     {
       "sku": "LEV-FOLDERS",
-      "title": "Papírová složka s chlopní",
-      "description": "Jednobarevná ekonomická složka pro archivaci a organizaci papírů.",
+      "title": "Paper flap folder",
+      "description": "Single-color economy folder for filing and organizing.",
       "unit": "pcs",
       "price": 150,
       "category": "office",
@@ -38,8 +38,8 @@
     },
     {
       "sku": "LEV-BINDER",
-      "title": "Kroužkový pořadač A4",
-      "description": "Plastový pořadač s dvěma kroužky pro sešívání listů a dokumentů.",
+      "title": "Ring binder A4",
+      "description": "Plastic two-ring binder for filing sheets and documents.",
       "unit": "pcs",
       "price": 320,
       "category": "office",

@@ -1,15 +1,15 @@
 {
   "id": "papirna",
   "name": "Papírna Holešovice",
-  "tagline": "Kvalitní papír a psací potřeby s doručením následující den.",
+  "tagline": "Quality paper and writing supplies with next-day delivery.",
   "inventoryLag": true,
   "autoConfirm": true,
   "delivery": {"type": "leadDays", "days": 1},
   "products": [
     {
       "sku": "PAP-A4-500",
-      "title": "Kancelářský papír A4 500 listů",
-      "description": "Bílý papír A4 80 g/m², ideální pro tisk a kopírování.",
+      "title": "Office paper A4, 500 sheets",
+      "description": "White A4 paper 80 g/m², ideal for printing and copying.",
       "unit": "pack",
       "price": 780,
       "category": "paper",
@@ -19,8 +19,8 @@
     },
     {
       "sku": "PAP-ENVELOPES-C6",
-      "title": "Obálky C6 bílé",
-      "description": "Balení 50 kusů bílých obálek velikosti C6 se samolepicím pruhem.",
+      "title": "White C6 envelopes",
+      "description": "Pack of 50 white self-seal C6 envelopes.",
       "unit": "pack",
       "price": 350,
       "category": "paper",
@@ -29,8 +29,8 @@
     },
     {
       "sku": "PAP-PEN-BLUE",
-      "title": "Kuličková tužka modrá",
-      "description": "Sada 10 modrých kuličkových per s hladkým písmem.",
+      "title": "Blue ballpoint pens",
+      "description": "Set of 10 smooth-writing blue ballpoint pens.",
       "unit": "pack",
       "price": 180,
       "category": "writing",
@@ -39,8 +39,8 @@
     },
     {
       "sku": "PAP-GEL-SET",
-      "title": "Sada gelových per 5 barev",
-      "description": "Barevná sada pěti gelových per pro tvorbu a designové práce.",
+      "title": "Gel pen set, 5 colors",
+      "description": "Five-color gel pen set for creative and design work.",
       "unit": "pack",
       "price": 520,
       "category": "writing",
@@ -49,8 +49,8 @@
     },
     {
       "sku": "PAP-NOTEBOOK",
-      "title": "Sešit linkovaný 100 listů",
-      "description": "Tuhý sešit s linkovaným papírem vhodný pro poznámky.",
+      "title": "Ruled notebook, 100 sheets",
+      "description": "Hardcover ruled notebook, great for meeting notes.",
       "unit": "pcs",
       "price": 450,
       "category": "paper",
@@ -59,8 +59,8 @@
     },
     {
       "sku": "PAP-PENCILS",
-      "title": "Sada tužek HB 12 kusů",
-      "description": "Profesionální grafitové tužky pro kreslení a psaní.",
+      "title": "HB pencils, set of 12",
+      "description": "Professional graphite pencils for drawing and writing.",
       "unit": "pack",
       "price": 240,
       "category": "writing",
