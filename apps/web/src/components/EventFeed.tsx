@@ -31,30 +31,30 @@ export function summary(e: EventView): string {
     case 'CAPTURE': return `captured ${amount} to provider`;
     case 'TASK_CREATED': return 'task created';
     case 'TASK_DONE': return 'task completed';
-    case 'TASK_FAILED': return `task failed: ${String(p.reason ?? '')}`;
+    case 'TASK_FAILED': return `task failed: ${slug(String(p.reason ?? ''))}`;
     case 'DEAL_QUOTED': return `quote ${typeof p.total === 'number' ? usd(p.total) : ''}`;
     case 'DEAL_ACCEPTED': return 'quote accepted';
     case 'DEAL_SETTLED': return 'deal settled';
-    case 'DEAL_CANCELLED': return `deal cancelled: ${String(p.reason ?? '')}`;
-    case 'OFFER_WITHDRAWN': return `offer withdrawn: ${String(p.reason ?? '')}`;
-    case 'REJECTED_BY_POLICY': return `rejected by policy: ${String(p.reason ?? '')}`;
+    case 'DEAL_CANCELLED': return `deal cancelled: ${slug(String(p.reason ?? ''))}`;
+    case 'OFFER_WITHDRAWN': return `offer withdrawn: ${slug(String(p.reason ?? ''))}`;
+    case 'REJECTED_BY_POLICY': return `rejected by policy: ${slug(String(p.reason ?? ''))}`;
     case 'ORDER_PLACED': return `store order ${shortId(String(p.storeOrderRef ?? p.storeOrderId ?? ''))}`;
     case 'PROOF_RECEIVED': return 'proof received';
     case 'ASSUMPTION': return String(p.assumption ?? 'assumption');
-    case 'RATING_CHANGED': return `rating ${String(p.before ?? '')} → ${String(p.after ?? '')} (${String(p.reason ?? '')})`;
+    case 'RATING_CHANGED': return `rating ${String(p.before ?? '')} → ${String(p.after ?? '')}`;
     case 'IDEMPOTENT_REPLAY': return `duplicate ignored: ${String(p.idempotencyKey ?? '')}`;
     case 'PROVIDER_ONBOARDED': return `provider onboarded: ${String(p.name ?? '')}`;
-    case 'WEBHOOK_REJECTED': return `webhook rejected: ${String(p.reason ?? '')}`;
-    case 'STEP_STARTED': return `step: ${String(p.step ?? '')}`;
-    case 'STEP_FAILED': return `step failed: ${String(p.step ?? p.error ?? '')}`;
-    case 'TOOL_CALL': return `→ ${String(p.tool ?? '')}`;
-    case 'TOOL_RESULT': return `← ${String(p.tool ?? '')}: ${String(p.summary ?? 'ok')}`;
+    case 'WEBHOOK_REJECTED': return `webhook rejected: ${slug(String(p.reason ?? ''))}`;
+    case 'STEP_STARTED': return `step: ${slug(String(p.step ?? ''))}`;
+    case 'STEP_FAILED': return `step failed: ${slug(String(p.step ?? p.error ?? ''))}`;
+    case 'TOOL_CALL': return `calling ${slug(String(p.tool ?? ''))}…`;
+    case 'TOOL_RESULT': return `${slug(String(p.tool ?? ''))}: ${slug(String(p.summary ?? 'done'))}`;
     case 'WAITING': return `waiting for ${slug(String(p.for ?? p.waitingFor ?? ''))}`;
     case 'DECISION': {
       const what = p.decision ?? p.reasoning
         ?? (p.scoreTable ? 'quotes evaluated' : p.refusal ? `refused: ${String(p.refusal)}` : String(p.step ?? ''));
-      const why = p.reason ? `: ${String(p.reason)}` : p.providerId ? ` (${String(p.providerId)})` : '';
-      return `decision: ${String(what)}${why}`;
+      const why = p.reason ? `: ${slug(String(p.reason))}` : p.providerId ? ` (${String(p.providerId)})` : '';
+      return `decision: ${slug(String(what))}${why}`;
     }
     default: return e.type;
   }
@@ -73,7 +73,7 @@ export function slug(v: string): string {
 }
 
 const MONEY_KEYS = new Set(['amount', 'total', 'max', 'unitPrice', 'lineTotal', 'budget']);
-const NOISE_KEYS = new Set(['entryId', 'walletId', 'idempotencyKey', 'correlationId', 'step', 'tool']);
+const NOISE_KEYS = new Set(['entryId', 'walletId', 'idempotencyKey', 'correlationId', 'step', 'tool', 'dealId', 'providerId', 'runId', 'taskId']);
 const looksLikeIso = (v: string) => /^\d{4}-\d{2}-\d{2}T/.test(v);
 
 /** Куратор деталей: payload -> человеческое дополнение карточки. null = нечего добавить. */
@@ -174,7 +174,7 @@ function Until({ until }: { until: string }) {
 export function EventRow({ e, showTask, raw }: { e: EventView; showTask?: boolean; raw?: boolean }) {
   const p = e.payload ?? {};
   return (
-    <div className={`rounded-lg border px-3 py-2 text-sm ${e.kind === 'agent' ? 'bg-muted/30' : 'bg-card'}`}>
+    <div className={`feed-in rounded-lg border px-3 py-2 text-sm ${e.kind === 'agent' ? 'bg-muted/30' : 'bg-card'}`}>
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
         <span className="text-[11px] tabular-nums text-muted-foreground">{fmtTs(e.ts)}</span>
         <span className="max-w-[160px] truncate text-xs text-muted-foreground" title={e.actor}>{actorLabel(e.actor)}</span>

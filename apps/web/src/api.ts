@@ -47,6 +47,12 @@ export interface DealView {
   status: string;
   quote: { total: number; deliveryEta: string; lines: Array<{ sku: string; title: string; unitPrice: number; quantity: number; lineTotal: number }> };
   cancelReason: string | null;
+  createdAt?: string;
+}
+
+/** «12 Oct, 14:05» — для дедлайнов и дат, где секунды только шумят. */
+export function fmtDate(x: string): string {
+  return new Date(x).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
 export interface EventView {

@@ -1,6 +1,6 @@
 import { Activity, ListTodo, Loader2, Plug, Sparkles, Wallet as WalletIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { api, usd, type EventView, type ReqView, type TaskView, type WalletView } from '../api';
+import { api, fmtDate, usd, type EventView, type ReqView, type TaskView, type WalletView } from '../api';
 import { GroupedEventFeed, TASK_BADGE } from '../components/EventFeed';
 import { navigate } from '../router';
 import { WalletSummary } from './Wallet';
@@ -100,7 +100,7 @@ export function BuyerPage({ events }: { events: EventView[] }) {
                 <p className="text-xs">
                   Budget <b>{usd(preview.request.budget.max)}</b>{' '}
                   {preview.request.budget.source === 'estimated' && <Badge variant="warning">agent estimate</Badge>}
-                  {' · '}Deadline <b>{new Date(preview.request.deadline).toLocaleString('en-GB')}</b>
+                  {' · '}Deadline <b>{fmtDate(preview.request.deadline)}</b>
                 </p>
                 {preview.assumptions.map((a, i) => (
                   <p key={i} className="text-xs text-muted-foreground">

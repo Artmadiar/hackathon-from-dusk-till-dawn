@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { api, usd, type DealView, type ProviderView, type TaskView } from '../api';
-import { EventFeed } from '../components/EventFeed';
+import { api, fmtDate, usd, type DealView, type ProviderView, type TaskView } from '../api';
+import { EventFeed, slug } from '../components/EventFeed';
 import { useEvents } from '../useEvents';
 import { TASK_BADGE } from '../components/EventFeed';
 import { Badge } from '@/components/ui/badge';
@@ -83,8 +83,20 @@ export function TaskPage({ taskId }: { taskId: string }) {
   if (!task) return <div className="py-10 text-center text-sm text-muted-foreground">Loading task…</div>;
 
   const storeName = (id: string) => providers[id]?.name ?? id;
-  /* Победившая сделка первой — глазу не нужно искать */
-  const sorted = [...deals].sort((a, b) => Number(ACTIVE_DEAL.has(b.status)) - Number(ACTIVE_DEAL.has(a.status)));
+  /* Один магазин — одна карточка. Агент ходит раундами, и у магазина может быть
+     несколько сделок (старая котировка + победный повтор) — показываем свежую/активную,
+     остальные упоминаем строчкой, чтобы не выглядело «три оффера от двух магазинов». */
+  const byStore = new Map<string, DealView[]>();
+  for (const d of deals) {
+    const list = byStore.get(d.providerId);
+    if (list) list.push(d); else byStore.set(d.providerId, [d]);
+  }
+  const cards = [...byStore.values()].map((list) => {
+    const newest = [...list].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''));
+    const primary = newest.find((d) => ACTIVE_DEAL.has(d.status)) ?? newest[0];
+    return { primary, earlier: newest.filter((d) => d !== primary) };
+  });
+  const sorted = cards.sort((a, b) => Number(ACTIVE_DEAL.has(b.primary.status)) - Number(ACTIVE_DEAL.has(a.primary.status)));
 
   return (
     <div className="flex flex-col gap-4">
@@ -96,7 +108,7 @@ export function TaskPage({ taskId }: { taskId: string }) {
           </div>
           <div className="text-xs text-muted-foreground">
             Budget {usd(task.request.budget.max)}{task.request.budget.source === 'estimated' && ' (agent estimate)'}
-            {' · '}deadline {new Date(task.request.deadline).toLocaleString('en-GB')}
+            {' · '}deadline {fmtDate(task.request.deadline)}
             {' · '}deliver to {task.request.deliveryAddress}
             {task.failReason && <span className="text-destructive"> · reason: {task.failReason}</span>}
           </div>
@@ -107,10 +119,10 @@ export function TaskPage({ taskId }: { taskId: string }) {
       <div className="grid items-start gap-4 lg:grid-cols-[400px_1fr]">
         <div className="flex flex-col gap-4">
           <div>
-            <h2 className="text-sm font-semibold">Offers from stores{deals.length ? ` (${deals.length})` : ''}</h2>
+            <h2 className="text-sm font-semibold">Offers from stores{byStore.size ? ` (${byStore.size})` : ''}</h2>
             <p className="text-xs text-muted-foreground">Quotes your agent collected — the accepted one is highlighted.</p>
           </div>
-          {sorted.map((d) => (
+          {sorted.map(({ primary: d, earlier }) => (
             <Card key={d.id} className={ACTIVE_DEAL.has(d.status) ? 'border-primary/60 shadow-md' : undefined}>
               <CardHeader>
                 <div className="flex items-center gap-2">
@@ -122,8 +134,14 @@ export function TaskPage({ taskId }: { taskId: string }) {
                   {DEAL_LABEL[d.status] ?? d.status}
                   {' · '}delivery by {new Date(d.quote.deliveryEta).toLocaleDateString('en-GB')}
                   {providers[d.providerId] && <> · rating {providers[d.providerId].rating.toFixed(1)}</>}
-                  {d.cancelReason && <span className="text-destructive"> · {d.cancelReason}</span>}
+                  {d.cancelReason && <span className="text-destructive"> · {slug(d.cancelReason)}</span>}
                 </div>
+                {earlier.length > 0 && (
+                  <div className="text-[11px] text-muted-foreground">
+                    earlier round{earlier.length > 1 ? 's' : ''}:{' '}
+                    {earlier.map((o) => `quoted ${usd(o.quote.total)} (${DEAL_LABEL[o.status] ?? o.status.toLowerCase()})`).join(' · ')}
+                  </div>
+                )}
               </CardHeader>
               <CardContent>
                 <Table>
