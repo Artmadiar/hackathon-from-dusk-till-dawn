@@ -204,7 +204,7 @@ export class DealService {
       await this.emit({
         type: 'REJECTED_BY_POLICY', taskId: res.task.id, dealId, userId: res.task.userId,
         providerId: res.deal.providerId,
-        payload: { code: res.code, message: res.message, amount: res.deal.quote.total },
+        payload: { code: res.code, reason: res.code, message: res.message, amount: res.deal.quote.total },
         correlationId: opts.correlationId,
       });
       return { ok: false, code: res.code, message: res.message };

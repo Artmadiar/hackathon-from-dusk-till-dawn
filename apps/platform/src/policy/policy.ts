@@ -14,8 +14,23 @@ export type PolicyDecision =
   | { ok: true }
   | { ok: false; code: PolicyRejectionCode; message: string };
 
+/** Дефолт для самозарегистрированных покупателей — тот же, что у демо-пользователя в seed. */
+export const DEFAULT_BUYER_POLICY = {
+  maxPerDeal: 7500,   // 75 $
+  maxPerDay: 10000,   // 100 $
+  totalBudget: 10000, // 100 $
+  allowedCategories: ['paper', 'writing', 'water', 'office'],
+} as const;
+
 export class PolicyService {
   constructor(private readonly db: Db) {}
+
+  /** Регистрация нового buyer: политика по умолчанию, существующую не трогаем. */
+  async ensureDefaultPolicy(userId: string): Promise<void> {
+    await this.db.insert(spendingPolicies)
+      .values({ userId, ...DEFAULT_BUYER_POLICY, allowedCategories: [...DEFAULT_BUYER_POLICY.allowedCategories] })
+      .onConflictDoNothing();
+  }
 
   async setPolicy(policy: SpendingPolicy): Promise<void> {
     await this.db.insert(spendingPolicies).values(policy)

@@ -46,7 +46,13 @@ const eventsQuery = new EventsQuery(db);
 registerEventRoutes(app, { eventsQuery, auth });
 registerAgentRoutes(app, { db, deals: dealService, registry, policy, dispatcher, events, clock, jwtSecret });
 registerPublicRoutes(app, { db, deals: dealService, ledger, registry, policy, dispatcher, events, clock, auth });
-registerAuthRoutes(app, { auth });
+registerAuthRoutes(app, {
+  auth,
+  onBuyerVerified: async (userId) => {
+    await ledger.createWallet({ ownerType: 'user', ownerId: userId });
+    await policy.ensureDefaultPolicy(userId);
+  },
+});
 registerAdminRoutes(app, { db, eventsQuery, auth });
 registerStripeRoutes(app, {
   ledger, auth,

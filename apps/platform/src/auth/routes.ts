@@ -3,7 +3,11 @@ import { z } from 'zod';
 import { AuthError, type AuthService } from './service.js';
 import { SESSION_COOKIE } from '../http/identity.js';
 
-export function registerAuthRoutes(app: FastifyInstance, deps: { auth: AuthService }): void {
+export function registerAuthRoutes(app: FastifyInstance, deps: {
+  auth: AuthService;
+  /** Вызывается после verify для buyer-учётки: кошелёк + дефолтная политика (C36). */
+  onBuyerVerified?: (userId: string) => Promise<void>;
+}): void {
   const { auth } = deps;
   const cookieOpts = { path: '/', httpOnly: true, sameSite: 'lax' as const };
 
@@ -22,6 +26,8 @@ export function registerAuthRoutes(app: FastifyInstance, deps: { auth: AuthServi
     if (!parsed.success) return reply.code(400).send({ error: 'bad_request' });
     try {
       const session = await auth.verifyOtp({ ...parsed.data, sessionId: req.cookies?.[SESSION_COOKIE] });
+      const verified = session.identities.find((i) => i.email === parsed.data.email.trim().toLowerCase());
+      if (verified?.role === 'buyer' && deps.onBuyerVerified) await deps.onBuyerVerified(verified.id);
       reply.setCookie(SESSION_COOKIE, session.id, { ...cookieOpts, expires: new Date(session.expiresAt) });
       return { session };
     } catch (e) {

@@ -37,7 +37,7 @@ export function summary(e: EventView): string {
     case 'DEAL_SETTLED': return 'deal settled';
     case 'DEAL_CANCELLED': return `deal cancelled: ${slug(String(p.reason ?? ''))}`;
     case 'OFFER_WITHDRAWN': return `offer withdrawn: ${slug(String(p.reason ?? ''))}`;
-    case 'REJECTED_BY_POLICY': return `rejected by policy: ${slug(String(p.reason ?? ''))}`;
+    case 'REJECTED_BY_POLICY': return `rejected by policy: ${slug(String(p.reason ?? p.code ?? ''))}`;
     case 'ORDER_PLACED': return `store order ${shortId(String(p.storeOrderRef ?? p.storeOrderId ?? ''))}`;
     case 'PROOF_RECEIVED': return 'proof received';
     case 'ASSUMPTION': return String(p.assumption ?? 'assumption');
@@ -122,6 +122,8 @@ function EventDetail({ e }: { e: EventView }) {
       if (typeof p.reason === 'string') bits.push(slug(p.reason));
       return bits.length ? <div className="mt-0.5">{bits.map((b) => line(b))}</div> : null;
     }
+    case 'REJECTED_BY_POLICY':
+      return typeof p.message === 'string' ? line(p.message) : null;
     case 'DEAL_QUOTED':
       return typeof p.deliveryEta === 'string'
         ? line(`delivery by ${new Date(p.deliveryEta).toLocaleDateString('en-GB')}`) : null;
