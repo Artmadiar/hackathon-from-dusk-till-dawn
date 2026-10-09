@@ -39,17 +39,20 @@
 
 Запись голоса: тихо, телефон близко, пауза 1–2 сек между блоками; сбился — повтори блок, лишнее вырежется.
 
-## Питч, 60 секунд — ФИНАЛ v2 (4 слайда: docs/pitch-slides.html, по ~15 сек, стрелки/клик)
+## Питч, 60 секунд — ФИНАЛ v3: живое демо + две фразы о платформе
 
-| Сек | Слайд | Текст (EN) |
+Экран: Buyer home открыт заранее (buyer залогинен, кошелёк $100, журнал чистый).
+Слайды (docs/pitch-slides.html) — запасной план, если лайв недоступен.
+
+| Сек | Действие | Текст (EN) |
 |---|---|---|
-| 0–15 | 1 · «Your agent can choose. It can't pay.» | "An AI agent today cannot really buy. It has no wallet. It cannot reach the stores. It cannot place an order or check what is in stock. So in the end, a human does the buying." |
-| 15–30 | 2 · Shop Elf: Put money in → Say what you need → Agents close the deal | "On Shop Elf, two agents make the deal. Your elf asks, store agents answer with offers. They clarify the details from both sides. And both sides validate: the offer must match the request, the delivery must match the offer." |
-| 30–45 | 3 · «Neither agent holds the money»: LOCKED → CONFIRMED → PAID | "The protection is built into the platform. It locks the money first. It pays the store only when the deal is confirmed. If something goes wrong, the money comes back. Agents cannot break these rules — they live in code." |
-| 45–60 | 4 · «Built in one night» + закрытие | "And all of this works end to end: discovery, wallets, payments, spending limits, failover. A real Stripe payment, four stores, finished deals — covered by tests, shown in our video. You say what you need. Your elf does the shopping. Shop Elf." |
+| 0–10 | Стоим на Buyer home | "This is Shop Elf: a marketplace where your buying agent and store agents close deals with real money. The platform holds the wallets, locks the money, and pays the store only when the deal is confirmed — the limits live in code." |
+| 10–50 | Вставить `Order 5 packs of A4 paper (500 sheets each), deliver within 4 days` → Draft → start the agent; смотрим степпер и офферы | по ходу: "I just type what we need — the elf drafts a real order." · "Three stores quoted. One dropped out — the money came back on its own." · "Settled. The store is paid, every cent is in the ledger." |
+| 50–60 | Финал на Task DONE | "You say what you need — your elf does the shopping. Shop Elf." |
 
-~150 слов, без жаргона; «limit lives in code» и «money comes back» — это ответы на чек-лист жюри
-(caps hold / no human pressing buttons / nothing pays twice) обычными словами.
+Прогон real-LLM: Create → SETTLED ≈ 20–25 сек (замерено при записи видео).
+Перед выходом: Reset demo в админке + топап (Stripe 4242 или SIMULATED) + перелогин окон.
+Бюджета $100 хватает на 2 прогона (~$42 каждый); третий честно упадёт over_total_budget.
 
 ## Что честно говорим про ограничения (критерий 5, 10%)
 
