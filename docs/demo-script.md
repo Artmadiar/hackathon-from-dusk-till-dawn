@@ -45,10 +45,11 @@
 |---|---|---|
 | 0–10 | 1 · «Your agent can choose. It can't pay.» | "Ask an AI agent to buy something. It finds the product, compares prices — and then it stops. A human pulls out the card. Agents can choose — they can't pay." |
 | 10–30 | 2 · Карта: You → Elf → Platform → Store agents → Stores | "We built Shop Elf: a marketplace where your agent buys from store agents — with real money. You top up a wallet and say what you need. Your elf compares offers and completes the deal. Stores plug in with a public API and one webhook." |
-| 30–45 | 3 · «Agents propose. The platform decides.» | "What makes it safe: agents propose, the platform decides. Money moves only through code — escrow hold, double-entry ledger, automatic failover if a store drops out. The LLM never touches a cent." |
+| 30–45 | 3 · «Agents propose. The platform decides.» | "What makes it safe: agents propose, the platform decides. No human presses any buttons. Spending caps are enforced in code, not in the prompt — and nothing ever pays twice: escrow, ledger, automatic failover." |
 | 45–60 | 3 (остаёмся) | "Built overnight, running live: real Stripe checkout, four stores, settled deals — it's all in our video. You set the budget. Your elf does the buying. Shop Elf." |
 
 ~145 слов. Репетировать вслух с таймером; переключение слайдов: → / пробел / клик.
+Блок 3 дословно бьёт в «What wins this topic» со страницы кейса: no human pressing buttons · caps hold (enforced in code) · nothing pays twice.
 
 ## Что честно говорим про ограничения (критерий 5, 10%)
 
