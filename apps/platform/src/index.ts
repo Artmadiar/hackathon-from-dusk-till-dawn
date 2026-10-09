@@ -47,7 +47,7 @@ registerEventRoutes(app, { eventsQuery, auth });
 registerAgentRoutes(app, { db, deals: dealService, registry, policy, dispatcher, events, clock, jwtSecret });
 registerPublicRoutes(app, { db, deals: dealService, ledger, registry, policy, dispatcher, events, clock, auth });
 registerAuthRoutes(app, { auth });
-registerAdminRoutes(app, { eventsQuery, auth });
+registerAdminRoutes(app, { db, eventsQuery, auth });
 registerStripeRoutes(app, {
   ledger, auth,
   secretKey: process.env.STRIPE_SECRET_KEY || undefined,

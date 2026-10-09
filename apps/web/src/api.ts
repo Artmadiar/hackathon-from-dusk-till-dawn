@@ -72,6 +72,23 @@ export interface ProviderView {
   active: boolean;
 }
 
+export interface AdminBuyerRow {
+  id: string; name: string; email: string;
+  balance: number; held: number;
+  tasks: { total: number; done: number; failed: number; active: number };
+  lastTaskAt: string | null;
+  policy: { maxPerDeal: number; maxPerDay: number; totalBudget: number; allowedCategories: string[] } | null;
+}
+
+export interface AdminProviderRow {
+  id: string; name: string; categories: string[]; rating: number; active: boolean; agentUrl: string;
+  earned: number;
+  deals: { total: number; settled: number; cancelled: number };
+  lastDealAt: string | null;
+}
+
+export interface AdminOverview { buyers: AdminBuyerRow[]; providers: AdminProviderRow[] }
+
 export class ApiError extends Error {
   readonly status: number;
   readonly body: Record<string, unknown>;

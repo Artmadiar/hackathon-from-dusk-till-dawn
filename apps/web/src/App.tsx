@@ -43,7 +43,7 @@ export function App() {
     ? [{ href: '#/', label: 'Tasks', current: !route.parts[0] || route.parts[0] === 'task' },
        { href: '#/wallet', label: 'Wallet', current: route.parts[0] === 'wallet' }]
     : active.role === 'admin'
-      ? [{ href: '#/admin', label: 'Journal', current: true }]
+      ? [{ href: '#/admin', label: 'Admin', current: true }]
       : [{ href: '#/provider', label: 'Provider portal', current: true }];
 
   return (

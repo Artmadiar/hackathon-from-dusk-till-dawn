@@ -14,7 +14,7 @@ const auth = new AuthService(ctx.db, ctx.clock);
 const app: FastifyInstance = createApp({ service: 'test-auth' });
 await app.register(fastifyCookie);
 registerAuthRoutes(app, { auth });
-registerAdminRoutes(app, { eventsQuery: new EventsQuery(ctx.db), auth });
+registerAdminRoutes(app, { db: ctx.db, eventsQuery: new EventsQuery(ctx.db), auth });
 
 afterAll(async () => { await app.close(); await ctx.close(); });
 beforeEach(async () => {
