@@ -29,13 +29,13 @@
 
 | Сек | Экран | Текст блока (EN) |
 |---|---|---|
-| 0–10 | Слайд-схема Shop Elf | "AI agents can decide. But to pay, a human still pulls out a card. Shop Elf is a marketplace where agents buy from agents — with real money." |
-| 10–20 | Кошелёк: $100, история с бейджем Stripe | "You top up a wallet once — a real Stripe checkout — and set a spending limit. From now on, your agent spends on its own, within that limit." |
-| 20–36 | Stores (витрина) → ввод текста → драфт → start the agent | "These are the connected stores, with live catalogs. You just type what you need. The agent turns it into a real order: items, budget, deadline." |
-| 36–47 | Офферы 3 магазинов; Papírna отваливается out-of-stock | "Three stores send their offers in seconds. The agent compares price, delivery and rating — and picks the best one." |
-| 47–57 | Бэк-офис Kancelář Plus: заказ прилетел, confirmed | "Now the platform holds the money and places the order. This is code, not AI — the AI never touches money. And here is the store's own system: the order just arrived." |
-| 57–76 | SETTLED + зелёный степпер; админ: hold → capture, deposit via Stripe | "The store confirms delivery, and the money moves to its wallet. If a store fails, the money comes back — and the agent orders from the next one." |
-| 76–90 | Финальный слайд с названием | "Everything you saw ran live. Only Stripe is in test mode — marked as simulated. Shop Elf: humans fund it, agents do the buying." |
+| 0–10 | Слайд-схема Shop Elf | "This is Shop Elf: your personal buying agent. You tell it what you need — and it buys from other agents on the marketplace, with real money." |
+| 10–20 | Кошелёк: $100, история с бейджем Stripe | "Your part is simple. Top up the wallet — one real Stripe payment — and set a spending limit. That is the elf's budget." |
+| 20–36 | Stores (витрина) → ввод текста → драфт → start the agent | "These are the stores on the marketplace, with live catalogs. Now you just type what you need, in plain words. The elf turns it into a real order — items, budget, deadline — and gets to work." |
+| 36–47 | Офферы 3 магазинов; Papírna отваливается out-of-stock | "Three stores answer with offers in seconds. The elf compares price, delivery and rating — and picks the best deal." |
+| 47–57 | Бэк-офис Kancelář Plus: заказ прилетел, confirmed | "The elf chooses — but money moves only through the platform: plain code, not AI. And this is the store's own system: the order just arrived." |
+| 57–76 | SETTLED + зелёный степпер; админ: hold → capture, deposit via Stripe | "The store confirms delivery — and the money goes to its wallet. Every cent is tracked in the ledger. And if a store fails? The money comes back, and the elf simply orders from the next one." |
+| 76–90 | Финальный слайд с названием | "Everything you saw ran live. Only Stripe is in test mode — marked as simulated. Shop Elf: you set the budget, your elf does the buying." |
 
 Запись голоса: тихо, телефон близко, пауза 1–2 сек между блоками; сбился — повтори блок, лишнее вырежется.
 
