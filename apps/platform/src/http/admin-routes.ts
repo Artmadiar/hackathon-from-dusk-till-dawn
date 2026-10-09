@@ -25,12 +25,11 @@ export function registerAdminRoutes(
   /** Обзор площадки: заказчики (кошелёк, задачи, политика) и исполнители (заработок, сделки).
    *  Демо-масштаб — агрегируем в TS, без group by. */
   /** Каталог провайдера живьём: платформа спрашивает его агента (GET /catalog).
-   *  Доступно админу (любой id) и провайдеру (только свой). */
+   *  Каталоги у магазинов и так публичные, поэтому любой залогиненный:
+   *  buyer видит витрину (#/stores), админ и провайдер — как раньше. */
   app.get<{ Params: { id: string } }>('/providers/:id/catalog', async (req, reply) => {
     const identity = await resolveIdentity(req, deps.auth);
-    const allowed = identity?.role === 'admin'
-      || (identity?.role === 'provider' && identity.providerId === req.params.id);
-    if (!allowed) return reply.code(identity ? 403 : 401).send({ error: 'admin_or_own_provider_required' });
+    if (!identity) return reply.code(401).send({ error: 'unauthenticated' });
     const [row] = await deps.db.select().from(providers).where(eq(providers.id, req.params.id));
     if (!row) return reply.code(404).send({ error: 'unknown_provider' });
     try {

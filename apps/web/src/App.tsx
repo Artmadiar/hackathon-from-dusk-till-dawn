@@ -10,6 +10,7 @@ import { AdminPage } from './pages/Admin';
 import { BuyerPage } from './pages/Buyer';
 import { LoginPage } from './pages/Login';
 import { OnboardStorePage, ProviderPage } from './pages/Provider';
+import { StoresPage } from './pages/Stores';
 import { TaskPage } from './pages/Task';
 import { WalletPage } from './pages/Wallet';
 
@@ -36,6 +37,7 @@ export function App() {
     switch (route.parts[0]) {
       case 'wallet': return <WalletPage events={events} query={route.query} />;
       case 'task': return <TaskPage taskId={route.parts[1] ?? ''} />;
+      case 'stores': return <StoresPage />;
       case 'admin': return <AdminPage events={events} />;
       case 'provider':
         return route.parts[1] === 'onboard' ? <OnboardStorePage /> : <ProviderPage events={events} />;
@@ -48,6 +50,7 @@ export function App() {
 
   const nav = active.role === 'buyer'
     ? [{ href: '#/', label: 'Tasks', current: !route.parts[0] || route.parts[0] === 'task' },
+       { href: '#/stores', label: 'Stores', current: route.parts[0] === 'stores' },
        { href: '#/wallet', label: 'Wallet', current: route.parts[0] === 'wallet' }]
     : active.role === 'admin'
       ? [{ href: '#/admin', label: 'Admin', current: true }]
